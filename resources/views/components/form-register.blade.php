@@ -33,7 +33,5 @@
         required
     />
 
-    <button type="submit" class="mt-4 bg-primary text-white py-2 px-4 rounded">
-        S'inscrire
-    </button>
+    <x-primary-btn type="submit" label="S'inscrire" />
 </form>

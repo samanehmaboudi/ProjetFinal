@@ -14,9 +14,5 @@
         placeholder="Entrez votre mot de passe" 
     />
 
-    <button 
-        type="submit" 
-        class="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
-        Se connecter
-    </button>
+    <x-primary-btn type="submit" label="Connexion" />
 </form>

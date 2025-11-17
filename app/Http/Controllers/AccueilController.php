@@ -27,7 +27,6 @@ class AccueilController extends Controller
             ->limit(10)
             ->get();
 
-        return view('auth', compact('bouteilles'));
+        return view('welcome', compact('bouteilles'));
     }
 }
-

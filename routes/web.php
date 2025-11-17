@@ -5,11 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CellierController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/', function () {
-    return view('accueil');
+    return view('auth');
 });
 
 

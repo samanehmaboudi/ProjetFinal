@@ -1,0 +1,245 @@
+# 📚 Service SaqScraper
+
+Le service **SaqScraper** permet d'importer automatiquement le catalogue de produits de la SAQ dans la base de données locale via l'API GraphQL d'Adobe Commerce utilisée par le site web de la SAQ.
+
+## 🏗️ Architecture
+
+Le service est structuré en plusieurs composants :
+
+- **Service principal** : `App\Services\SaqScraper` - Gère les requêtes GraphQL et le traitement des données
+- **Commande Artisan** : `php artisan saq:import` - Point d'entrée pour lancer l'importation
+- **Modèles Eloquent** : `BouteilleCatalogue`, `Pays`, `TypeVin` - Stockage des données importées
+- **Migrations** : Création des tables nécessaires dans la base de données
+
+## 🔧 Fonctionnement
+
+### 1. Communication avec l'API GraphQL
+
+Le service utilise l'endpoint GraphQL d'Adobe Commerce (`https://catalog-service.adobe.io/graphql`) pour récupérer les produits. Il envoie des requêtes de type `productSearch` avec :
+- Pagination automatique (24 produits par page)
+- Filtres sur les produits disponibles
+- Tri par prix décroissant
+- Support des catégories spécifiques
+
+### 2. Traitement des données
+
+Pour chaque produit récupéré, le service :
+- **Extrait les informations principales** : nom, SKU (code SAQ), prix, description
+- **Détermine le type de vin** : Rouge, Blanc, Rosé, Champagne, Spiritueux (basé sur les attributs couleur et identité)
+- **Identifie le pays et la région** : À partir des attributs `pays_origine` et `region_origine`
+- **Extrait les métadonnées** : Millésime, volume, images
+- **Télécharge les images** : Stockage local dans `storage/app/public/products/`
+
+### 3. Sauvegarde en base de données
+
+Les données sont organisées dans trois tables liées :
+- **`pays`** : Liste des pays d'origine (création automatique si inexistant)
+- **`type_vin`** : Liste des types de vin (création automatique si inexistant)
+- **`bouteille_catalogue`** : Détails complets des bouteilles avec relations
+
+La méthode `updateOrCreate` assure qu'un produit avec le même code SAQ sera mis à jour plutôt que dupliqué.
+
+### 4. Gestion des erreurs et rate limiting
+
+- **Délai entre requêtes** : Configurable (défaut : 2 secondes) pour respecter les limites de l'API
+- **Gestion des erreurs** : Logging détaillé des erreurs sans interrompre l'importation
+- **Retry logic** : Gestion automatique des échecs temporaires
+
+## 📋 Configuration
+
+### Variables d'environnement (`.env`)
+
+```env
+# Clé API pour l'authentification GraphQL (optionnel, une clé par défaut est fournie)
+SAQ_X_API_KEY=7a7d7422bd784f2481a047e03a73feaf
+SAQ_CLIENT_ID=7a7d7422bd784f2481a047e03a73feaf
+
+# Configuration Magento/Adobe Commerce
+SAQ_MAGENTO_STORE_CODE=main_website_store
+SAQ_MAGENTO_STORE_VIEW_CODE=fr
+SAQ_MAGENTO_WEBSITE_CODE=base
+SAQ_MAGENTO_CUSTOMER_GROUP=
+SAQ_MAGENTO_ENVIRONMENT_ID=2ce24571-9db9-4786-84a9-5f129257ccbb
+```
+
+### Préparation de la base de données
+
+Avant d'utiliser le service, assurez-vous que les migrations sont exécutées :
+
+```bash
+php artisan migrate
+```
+
+Cela créera les tables nécessaires :
+- `pays`
+- `type_vin`
+- `bouteille_catalogue`
+
+## 🚀 Utilisation
+
+### Commande de base
+
+```bash
+php artisan saq:import
+```
+
+Cette commande importera tous les produits disponibles du catalogue SAQ avec les paramètres par défaut :
+- Pas de limite sur le nombre de produits
+- Délai de 2 secondes entre les requêtes
+- Toutes les catégories
+
+### Options disponibles
+
+#### Limiter le nombre de produits
+
+Pour tester ou importer un nombre limité de produits :
+
+```bash
+php artisan saq:import --limite=10
+```
+
+#### Importer une catégorie spécifique
+
+Pour importer uniquement les produits d'une catégorie particulière :
+
+```bash
+php artisan saq:import --categorie=produits/vin-rouge
+```
+
+Les catégories disponibles incluent :
+- `produits/vin-rouge`
+- `produits/vin-blanc`
+- `produits/vin-rose`
+- `produits/champagne`
+- `produits/spiritueux`
+- etc.
+
+#### Ajuster le délai entre requêtes
+
+Pour respecter les limites de l'API ou accélérer l'importation :
+
+```bash
+# Délai plus long (plus sûr)
+php artisan saq:import --delai=5
+
+# Délai plus court (plus rapide, mais risque de blocage)
+php artisan saq:import --delai=1
+```
+
+**Note** : Le délai minimum est de 1 seconde pour éviter la surcharge de l'API.
+
+#### Utiliser une clé API personnalisée
+
+Si vous avez votre propre clé API :
+
+```bash
+php artisan saq:import --client-id=votre_cle_api
+```
+
+### Exemples combinés
+
+```bash
+# Importer 50 vins rouges avec un délai de 3 secondes
+php artisan saq:import --categorie=produits/vin-rouge --limite=50 --delai=3
+
+# Import rapide pour test (10 produits, 1 seconde de délai)
+php artisan saq:import --limite=10 --delai=1
+```
+
+## 📊 Données importées
+
+Pour chaque bouteille, les informations suivantes sont importées :
+
+| Champ | Description | Source |
+|-------|-------------|--------|
+| `code_saQ` | Code SKU unique de la SAQ | `product.sku` |
+| `nom` | Nom complet du produit | `product.name` |
+| `prix` | Prix en dollars canadiens | `product.price_range` |
+| `type_vin` | Type (Rouge, Blanc, Rosé, etc.) | Attributs `couleur` / `identite_produit` |
+| `pays` | Pays d'origine | Attribut `pays_origine` |
+| `region` | Région ou appellation | Attributs `region_origine` / `appellation` |
+| `millesime` | Année de récolte | Attribut `millesime_produit` |
+| `volume` | Taille de la bouteille | Attribut `format_contenant_ml` |
+| `url_image` | Chemin local de l'image | Téléchargée depuis `product.image.url` |
+| `date_import` | Date et heure d'importation | Timestamp automatique |
+
+## 🔍 Vérification des données importées
+
+Pour vérifier les produits importés, vous pouvez utiliser Tinker :
+
+```bash
+php artisan tinker
+```
+
+```php
+// Compter le nombre de bouteilles importées
+App\Models\BouteilleCatalogue::count();
+
+// Afficher les 10 dernières bouteilles
+App\Models\BouteilleCatalogue::with(['pays', 'typeVin'])->latest('date_import')->take(10)->get();
+
+// Compter par type de vin
+App\Models\BouteilleCatalogue::join('type_vin', 'bouteille_catalogue.id_type_vin', '=', 'type_vin.id')
+    ->select('type_vin.nom', DB::raw('count(*) as total'))
+    ->groupBy('type_vin.nom')
+    ->get();
+```
+
+## ⚠️ Notes importantes
+
+1. **Respect des limites de l'API** : Utilisez un délai approprié (minimum 2 secondes recommandé) pour éviter d'être bloqué par l'API de la SAQ.
+
+2. **Images** : Les images sont téléchargées et stockées localement. Assurez-vous que le lien symbolique `storage` est créé :
+   ```bash
+   php artisan storage:link
+   ```
+
+3. **Performance** : L'importation complète du catalogue peut prendre plusieurs heures. Utilisez l'option `--limite` pour tester d'abord.
+
+4. **Mises à jour** : Relancer la commande mettra à jour les produits existants (basé sur le `code_saQ`) plutôt que de créer des doublons.
+
+5. **Erreurs** : Consultez les logs Laravel (`storage/logs/laravel.log`) pour diagnostiquer les problèmes d'importation.
+
+## 🛠️ Développement
+
+Pour modifier ou étendre le service :
+
+- **Service** : `app/Services/SaqScraper.php`
+- **Commande** : `app/Console/Commands/ImporterProduitsSaq.php`
+- **Modèles** : `app/Models/BouteilleCatalogue.php`, `app/Models/Pays.php`, `app/Models/TypeVin.php`
+
+## 📝 Exemples de code
+
+### Utiliser le service directement dans le code
+
+```php
+use App\Services\SaqScraper;
+
+// Créer une instance avec délai de 2 secondes
+$scraper = new SaqScraper(2);
+
+// Importer 10 produits
+$nombreImportes = $scraper->importerCatalogue(null, 10, 2);
+
+echo "Produits importés : {$nombreImportes}";
+```
+
+### Accéder aux données importées
+
+```php
+use App\Models\BouteilleCatalogue;
+
+// Récupérer toutes les bouteilles avec leurs relations
+$bouteilles = BouteilleCatalogue::with(['pays', 'typeVin'])->get();
+
+// Rechercher par type de vin
+$vinsRouges = BouteilleCatalogue::whereHas('typeVin', function($query) {
+    $query->where('nom', 'Rouge');
+})->get();
+
+// Filtrer par pays
+$vinsFrance = BouteilleCatalogue::whereHas('pays', function($query) {
+    $query->where('nom', 'France');
+})->get();
+```
+

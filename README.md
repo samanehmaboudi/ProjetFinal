@@ -18,8 +18,8 @@ Permettre à un utilisateur de :
 ## 🚀 Fonctionnalités clés (en cours de développement)
 
 - ✅ Maquettes mobiles (Accueil, Cellier, Authentification)
-- ✅ Base technique Laravel avec support MySQL
-- ⏳ **Import automatisé du catalogue SAQ** via GraphQL (Adobe Commerce API)
+- ✅ Base technique Laravel avec support MySQL/SQLite
+- ✅ **Import automatisé du catalogue SAQ** via GraphQL (Adobe Commerce API)
 - ⏳ Authentification (connexion / inscription)
 - ⏳ Gestion multi-celliers par utilisateur
 - ⏳ CRUD complet sur les bouteilles de cellier
@@ -40,6 +40,20 @@ Permettre à un utilisateur de :
 | **Tests**     | PHPUnit 11.5                       |
 | **Design**    | Figma (mobile-first)               |
 | **Gestion projet** | Jira (Scrum/Agile)            |
+
+---
+
+## 📚 Service SaqScraper
+
+Le service **SaqScraper** permet d'importer automatiquement le catalogue de produits de la SAQ dans la base de données locale via l'API GraphQL d'Adobe Commerce.
+
+Pour une documentation complète sur le service, consultez [SAQSCRAPER_README.md](SAQSCRAPER_README.md).
+
+**Utilisation rapide** :
+```bash
+# Importer 10 produits pour tester
+php artisan saq:import --limite=10
+```
 
 ---
 
@@ -71,4 +85,58 @@ Tommy Bourgeois
 1. **Cloner le dépôt**
    ```bash
    git clone https://github.com/ProjetFinal-Maisonneuve/ProjetFinal.git
-   cd  ProjetFinal
+   cd ProjetFinal
+   ```
+
+2. **Installer les dépendances PHP**
+   ```bash
+   composer install
+   ```
+
+3. **Configurer l'environnement**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Configurer la base de données**
+   
+   Modifiez le fichier `.env` pour configurer votre base de données (SQLite recommandé pour le développement) :
+   ```env
+   DB_CONNECTION=sqlite
+   SESSION_DRIVER=file
+   ```
+
+   Créez le fichier de base de données SQLite :
+   ```bash
+   touch database/database.sqlite
+   ```
+
+5. **Exécuter les migrations**
+   ```bash
+   php artisan migrate
+   ```
+
+6. **Installer les dépendances frontend**
+   ```bash
+   npm install
+   ```
+
+7. **Créer le lien symbolique pour le stockage**
+   ```bash
+   php artisan storage:link
+   ```
+
+8. **Lancer le serveur de développement**
+   ```bash
+   php artisan serve
+   ```
+
+   L'application sera accessible à `http://localhost:8000`
+
+9. **Importer le catalogue SAQ (optionnel)**
+   ```bash
+   php artisan saq:import --limite=10
+   ```
+
+   Voir [SAQSCRAPER_README.md](SAQSCRAPER_README.md) pour la documentation complète du service.

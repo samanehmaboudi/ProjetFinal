@@ -5,14 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CellierController;
 use App\Http\Controllers\AccueilController;
 
-<<<<<<< HEAD
 Route::get('/', [AccueilController::class, 'index']);
-=======
-// Route::get('/', function () {
-//     return view('catalogue.index');
-// });
->>>>>>> a908d07f3743df905fd93dc2e59ac54e7eb4df4f
-
 
 // Formulaires
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.form');

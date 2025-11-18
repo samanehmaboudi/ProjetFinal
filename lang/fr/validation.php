@@ -41,7 +41,7 @@ return [
     'doesnt_contain'         => 'Le champ :attribute ne doit contenir aucun des éléments suivants : :values.',
     'doesnt_end_with'        => 'Le champ :attribute ne doit pas finir avec une des valeurs suivantes : :values.',
     'doesnt_start_with'      => 'Le champ :attribute ne doit pas commencer avec une des valeurs suivantes : :values.',
-    'email'                  => 'Le champ :attribute doit être une adresse e-mail valide.',
+    'email'                  => 'Le :attribute doit être une adresse e-mail valide.',
     'ends_with'              => 'Le champ :attribute doit se terminer par une des valeurs suivantes : :values',
     'enum'                   => 'Le champ :attribute sélectionné est invalide.',
     'exists'                 => 'Le champ :attribute sélectionné est invalide.',
@@ -89,7 +89,7 @@ return [
         'array'   => 'Le tableau :attribute ne peut pas contenir plus que :max éléments.',
         'file'    => 'La taille du fichier de :attribute ne peut pas dépasser :max kilo-octets.',
         'numeric' => 'La valeur de :attribute ne peut pas être supérieure à :max.',
-        'string'  => 'Le texte de :attribute ne peut pas contenir plus de :max caractères.',
+        'string'  => 'Le :attribute ne peut pas contenir plus de :max caractères.',
     ],
     'max_digits'             => 'Le champ :attribute ne doit pas avoir plus de :max chiffres.',
     'mimes'                  => 'Le champ :attribute doit être un fichier de type : :values.',
@@ -98,7 +98,7 @@ return [
         'array'   => 'Le tableau :attribute doit contenir au moins :min éléments.',
         'file'    => 'La taille du fichier de :attribute doit être supérieure ou égale à :min kilo-octets.',
         'numeric' => 'La valeur de :attribute doit être supérieure ou égale à :min.',
-        'string'  => 'Le texte de :attribute doit contenir au moins :min caractères.',
+        'string'  => 'Le :attribute doit contenir au moins :min caractères.',
     ],
     'min_digits'             => 'Le champ :attribute doit avoir au moins :min chiffres.',
     'missing'                => 'Le champ :attribute doit être manquant.',
@@ -129,7 +129,7 @@ return [
     'prohibited_unless'      => 'Le champ :attribute est interdit à moins que :other est l\'une des valeurs :values.',
     'prohibits'              => 'Le champ :attribute interdit :other d\'être présent.',
     'regex'                  => 'Le format du champ :attribute est invalide.',
-    'required'               => 'Le champ :attribute est obligatoire.',
+    'required'               => 'Le :attribute est obligatoire.',
     'required_array_keys'    => 'Le champ :attribute doit contenir des entrées pour : :values.',
     'required_if'            => 'Le champ :attribute est obligatoire quand la valeur de :other est :value.',
     'required_if_accepted'   => 'Le champ :attribute est obligatoire quand le champ :other a été accepté.',
@@ -155,4 +155,12 @@ return [
     'uppercase'              => 'Le champ :attribute doit être en majuscules.',
     'url'                    => 'Le format de l\'URL de :attribute n\'est pas valide.',
     'uuid'                   => 'Le champ :attribute doit être un UUID valide',
+
+    // Ajouter la traduction des nouveaux messages ici
+    'attributes' => [
+        'password' => 'mot de passe',
+        'email'    => 'courriel',
+        'name'     => 'nom',
+        'phone'    => 'téléphone',
+    ],
 ];

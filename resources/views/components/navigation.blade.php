@@ -1,6 +1,21 @@
-<nav class="w-full fixed bottom-0 left-0 bg-card bg- border-t border-border-base shadow-sm flex justify-between">
+@props(['addCellarBtn' => false, 'addWineBtn' => false])
+
+<section class="w-full fixed bottom-0 left-0 flex flex-col gap-4 items-center">
+   {{-- Permet l'affichage du bouton Ajouter un cellier --}}
+   @if ($addCellarBtn == true)
+      <div class="w-full max-w-md px-4 pointer-events-auto">
+            <x-primary-btn label="+ Créer un nouveau cellier" class="w-full py-3 shadow-lg" />
+       </div>
+   @endif
+   {{-- Permet l'affichage du bouton Ajouter un vin --}}
+   @if ($addWineBtn == true)
+      <div class="w-full flex justify-end px-4 pointer-events-auto">
+            <x-primary-btn label="+" rounded="full" class="px-8 py-6 shadow-lg" />
+       </div>
+   @endif
+<nav class="w-full bg-card bg- border-t border-border-base shadow-sm flex justify-between">
    <x-nav-item label='Celliers' icon='wine' url='test' />
    <x-nav-item label='Explorer' icon='compass' url='test' />
    <x-nav-item label='Compte' icon='user' url='test' />
-   
 </nav>
+</section>

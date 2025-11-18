@@ -24,7 +24,10 @@
         <main class="bg-body">
             @yield('content')
         </main>
-        <x-navigation />
+        <x-navigation 
+            :addCellarBtn="$__env->hasSection('add-cellar-btn')" 
+            :addWineBtn="$__env->hasSection('add-wine-btn')"
+        />
     </body>
 
     </html>

@@ -1,2 +1,2 @@
-@props(['label' => 'Click Me', 'type' => 'button'])
-<button class='bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-primary-hover transition-colors duration-300' id="{{ $attributes->get('id') }}">{{ $label }}</button>
+@props(['label' => 'Click Me', 'type' => 'button', 'rounded' => 'lg'])
+<button class='bg-primary text-white font-bold py-2 px-4 rounded-{{ $rounded }} hover:bg-primary-hover transition-colors duration-300 {{ $attributes->get('class') }}' id="{{ $attributes->get('id') }}">{{ $label }}</button>

@@ -2,7 +2,8 @@
     'label' => 'Click Me',
     'type' => 'button',     // button | submit | href
     'route' => null,
-    'rounded' => 'lg'
+    'rounded' => 'lg',
+    'id' => null,
 ])
 
 @php
@@ -24,14 +25,14 @@
 @if ($type === 'href')
     {{-- Génère un <a> --}}
     <a href="{{ $href }}"
-       {{ $attributes->merge(['class' => $classes]) }}>
+       {{ $attributes->merge(['id' => $id, 'class' => $classes]) }}>
         {{ $label }}
     </a>
 
 @else
     {{-- Génère un <button> --}}
     <button type="{{ $type }}"
-        {{ $attributes->merge(['class' => $classes]) }}>
+        {{ $attributes->merge(['id' => $id,'class' => $classes]) }}>
         {{ $label }}
     </button>
 @endif

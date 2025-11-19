@@ -88,4 +88,24 @@
     </div>
 
 </section>
+<div id='addWineBtnContainer' class="fixed z-10 bottom-0 left-0 w-full p-4 pt-10 bg-card border border-border-base shadow-lg rounded-t-lg">
+    <span class="flex items-center justify-between mb-4"> 
+       <h1 class="text-3xl text-heading font-heading">Ajouter un vin</h1> 
+       <x-dynamic-component :component="'lucide-x'" class="w-6 h-6"/>
+    </span>
+    <div class="flex flex-col gap-4">
+    <x-icon-text-btn
+        :href="route('bouteilles.manuelles.create', $cellier->id)"
+        icon="wine"
+        title="Explorer le catalogue SAQ"
+        subtitle="Recherchez des vins répertoriés à la SAQ."
+    />
+    <x-icon-text-btn
+        :href="route('bouteilles.manuelles.create', $cellier->id)"
+        icon="wine"
+        title="Ajouter Manuellement"
+        subtitle="Pour les vins non répertoriés à la SAQ."
+    />
+    </div>
+</div>
 @endsection

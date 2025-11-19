@@ -4,24 +4,25 @@
 <div class="min-h-screen bg-background pt-24">
     <div class="max-w-xl mx-auto bg-card border border-border-base rounded-xl shadow-md p-6 space-y-6">
         <h1 class="text-xl font-bold text-text-title">
-            Ajout manuel d’une bouteille
+            Modification manuelle d’une bouteille
         </h1>
 
         <form
             id="form-bouteille-manuelle"
             method="POST"
-            action="{{ route('bouteilles.manuelles.store', $cellier) }}"
+            action="{{ route('bouteilles.update', [$cellier, $bouteille]) }}"
             novalidate
             class="space-y-4"
         >
             @csrf
-
+            @method('PUT')
             {{-- Nom (obligatoire) --}}
             <x-input
                 label="Nom de la bouteille"
                 name="nom"
                 :required="true"
                 placeholder="Ex : Château X"
+                value="{{ old('nom', $bouteille->nom) }}"
             />
 
             {{-- Pays --}}
@@ -29,6 +30,7 @@
                 label="Pays"
                 name="pays"
                 placeholder="Ex : France"
+                value="{{ old('pays', $bouteille->pays) }}"
             />
 
             {{-- Format --}}
@@ -36,6 +38,7 @@
                 label="Format"
                 name="format"
                 placeholder="Ex : 750 ml"
+                value="{{ old('format', $bouteille->format) }}"
             />
 
             {{-- Quantité (obligatoire) --}}
@@ -45,6 +48,7 @@
                 type="number"
                 :required="true"
                 placeholder="Ex : 1"
+                value="{{ old('quantite', $bouteille->quantite) }}"
             />
 
             {{-- Prix (obligatoire, décimal) --}}
@@ -54,11 +58,12 @@
                 type="text"
                 :required="true"
                 placeholder="Ex : 12.50"
+                value="{{ old('prix', $bouteille->prix) }}"
             />
 
             <div class="pt-4 flex justify-between">
                 <x-primary-btn
-                    label="Ajouter la bouteille"
+                    label="Modifier la bouteille"
                     type="submit"
                     id="btn-submit-bouteille"
                 />

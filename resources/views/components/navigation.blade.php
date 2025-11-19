@@ -4,7 +4,7 @@
    {{-- Permet l'affichage du bouton Ajouter un cellier --}}
    @if ($addCellarBtn == true)
       <div class="w-full max-w-md px-4 pointer-events-auto">
-            <x-primary-btn label="+ Créer un nouveau cellier" route="cellar.create" class="w-full py-3 shadow-lg" />
+            <x-primary-btn type="href" label="+ Créer un nouveau cellier" route="cellar.create" class="w-full py-3 shadow-lg" />
        </div>
    @endif
    {{-- Permet l'affichage du bouton Ajouter un vin --}}

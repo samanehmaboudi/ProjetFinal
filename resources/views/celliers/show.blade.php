@@ -1,19 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-background pt-24">
-    <div class="max-w-5xl mx-auto space-y-6">
+<div class="min-h-screen bg-background">
 
+    <div class="max-w-5xl mx-auto space-y-6">
+<x-page-header title='{{ $cellier->nom }}' undertitle="Vue principale du cellier – liste des bouteilles." />
         {{-- En-tête du cellier --}}
         <div class="bg-card border border-border-base rounded-xl shadow-md p-6 flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-text-title">
-                    {{ $cellier->nom }}
-                </h1>
-                <p class="text-sm text-text-muted">
-                    Vue principale du cellier – liste des bouteilles.
-                </p>
-            </div>
 
             <a
                 href="{{ route('bouteilles.manuelles.create', $cellier) }}"
@@ -57,6 +50,13 @@
                                     <p><span class="font-medium text-text-body">Prix :</span> {{ number_format($bouteille->prix, 2, ',', ' ') }} $</p>
                                 @endif
                             </div>
+                                <x-delete-btn label="Supprimer la bouteille" route="{{ route('bouteilles.delete', ['cellier' => $cellier->id, 'bouteille' => $bouteille->id]) }}" />
+                                @if ($bouteille->code_saq === null)
+                                    <a href="{{ route('bouteilles.edit', [$cellier->id, $bouteille->id]) }}"
+                                    class="text-blue-600 hover:underline">
+                                        Modifier
+                                    </a>
+                                @endif
                         </div>
                     @endforeach
                 </div>

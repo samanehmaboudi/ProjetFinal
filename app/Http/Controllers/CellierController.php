@@ -148,6 +148,29 @@ class CellierController extends Controller
     }
 
     /**
+     * Supprime une bouteille dans un cellier (pas dans le catalogue).
+     * @param Cellier $cellier Le cellier contenant la bouteille
+     * @param Bouteille $bouteille La bouteille à supprimer
+     */
+    public function deleteBottle(Cellier $cellier, Bouteille $bouteille): RedirectResponse
+    {
+        // Vérifie que le cellier appartient au user
+        $this->authorizeCellier($cellier);
+
+        // Vérifie que la bouteille appartient à CE cellier
+        if ($bouteille->cellier_id !== $cellier->id) {
+            abort(403);
+        }
+
+        // Supprimer la bouteille (dans le cellier seulement)
+        $bouteille->delete();
+
+        return redirect()
+            ->route('cellar.show', $cellier)
+            ->with('success', 'La bouteille a été supprimée du cellier.');
+    }
+
+    /**
      * Vérifie que le cellier appartient bien à l'utilisateur connecté.
      * 
      * @param Cellier $cellier Le cellier à vérifier

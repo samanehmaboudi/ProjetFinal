@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CellierController extends Controller
 {
-/**
+    /**
      * Liste les celliers de l'utilisateur connecté.
      */
     public function index()
@@ -19,7 +19,7 @@ class CellierController extends Controller
             ->orderByDesc('date_creation')
             ->get();
 
-        return view('celliers.index', compact('celliers'));
+        return view('cellar.index', compact('celliers'));
     }
 
     /**
@@ -27,7 +27,7 @@ class CellierController extends Controller
      */
     public function create()
     {
-        return view('celliers.create');
+        return view('cellar.create');
     }
 
     /**
@@ -42,12 +42,11 @@ class CellierController extends Controller
 
         $request->user()->celliers()->create([
             'nom'           => $validated['nom'],
-            'date_creation' => now(),  // correspond à la colonne de ta table
             // 'description' => $validated['description'] ?? null, // si tu as cette colonne
         ]);
 
         return redirect()
-            ->route('celliers.index')
+            ->route('cellar.index')
             ->with('success', 'Le cellier a été créé avec succès.');
     }
 
@@ -68,7 +67,7 @@ class CellierController extends Controller
     {
         $this->authorizeCellier($cellier);
 
-        return view('celliers.edit', compact('cellier'));
+        return view('cellar.update', compact('cellier'));
     }
 
     /**
@@ -89,7 +88,7 @@ class CellierController extends Controller
         ]);
 
         return redirect()
-            ->route('celliers.index')
+            ->route('cellar.index')
             ->with('success', 'Le cellier a été mis à jour.');
     }
 
@@ -103,7 +102,7 @@ class CellierController extends Controller
         $cellier->delete();
 
         return redirect()
-            ->route('celliers.index')
+            ->route('cellar.index')
             ->with('success', 'Le cellier a été supprimé.');
     }
 
@@ -112,7 +111,7 @@ class CellierController extends Controller
      */
     protected function authorizeCellier(Cellier $cellier): void
     {
-        if ($cellier->id_utilisateur !== Auth::id()) {
+        if ($cellier->user_id !== Auth::id()) {
             abort(403);
         }
     }

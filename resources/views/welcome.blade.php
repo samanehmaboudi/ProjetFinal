@@ -3,8 +3,6 @@
 @section('title', 'Welcome')
 
 @section('content')
-dsada
-        
         {{-- Section d'affichage des bouteilles pour les tests --}}
         @if(isset($bouteilles) && $bouteilles->count() > 0)
             <section class="w-full mt-12 mb-8">

@@ -19,13 +19,16 @@
             </style>
         @endif
     </head>
-    <body>
+    <body class="bg-body">
         <x-header :logoPath='asset("images/logo_vino.png")' />
-        {{-- Height fixer temporaire --}}
-        <main class="bg-body" style="min-height: 150vh;">
+        <main class="bg-body mb-30">
             @yield('content')
         </main>
-        <x-navigation />
+        {{-- Envoie quelle bouton a afficher sur la page. Voir navigation.blade.php --}}
+        <x-navigation 
+            :addCellarBtn="$__env->hasSection('add-cellar-btn')" 
+            :addWineBtn="$__env->hasSection('add-wine-btn')"
+        />
     </body>
 
     </html>

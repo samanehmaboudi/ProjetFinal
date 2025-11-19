@@ -41,6 +41,7 @@
     /* UI COLOR TOKENS (valid with utility classes) */
     --color-body: var(--color-neutral-300);
     --color-card: var(--color-neutral-100);
+    --color-card-hover: var(--color-neutral-300);
     --color-text-body: var(--color-neutral-800);
     --color-text-heading: var(--color-neutral-900);
     --color-muted: var(--color-neutral-600);
@@ -70,6 +71,9 @@
     --spacing-8: 32px;
     --spacing-12: 48px;
 
+    --spacing-header: var(--header-height);
+    --header-height: 72px;
+
     /* FONT SIZES */
     --text-xs: 12px;
     --text-sm: 14px;
@@ -83,4 +87,20 @@
     /* TRANSITION DURATIONS */
     --duration-fast: 150ms;
     --duration-base: 250ms;
+
+    /* Animations */
+    @keyframes shake {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        25% {
+            transform: translateY(-0.5px);
+        }
+        75% {
+            transform: translateY(0.5px);
+        }
+    }
+
+    --animate-shake: shake 0.4s ease-in-out infinite;
 }

@@ -25,17 +25,27 @@ Route::post('/logout', [AuthController::class, 'logout'])
 // Routes protégées : seulement accessibles si la session est ouverte
 Route::middleware('auth')->group(function () {
 
-    // Page principale après login/inscription : liste des celliers
-    Route::get('/celliers', [CellierController::class, 'index'])->name('celliers.index');
+    // --- Gestion des celliers ---
 
-    // Vue principale d’un cellier (liste des bouteilles)
-    Route::get('/celliers/{cellier}', [CellierController::class, 'show'])->name('celliers.show');
+    // Liste des celliers
+    Route::get('/celliers', [CellierController::class, 'index'])->name('cellar.index');
 
-    // Formulaire d'ajout manuel d'une bouteille dans un cellier
+    Route::get('/celliers/create', [CellierController::class, 'create'])->name('cellar.create');
+
+    // Enregistrement d'un nouveau cellier
+    Route::post('/celliers/create', [CellierController::class, 'store'])->name('cellar.store');
+
+    // Vue principale d’un cellier 
+    Route::get('/celliers/{cellier}', [CellierController::class, 'show'])->name('cellar.show');
+    Route::get('/celliers/{cellier}/edit', [CellierController::class, 'edit'])->name('cellar.edit');
+    Route::put('/celliers/{cellier}/edit', [CellierController::class, 'update'])->name('cellar.update');
+    Route::delete('/celliers/{cellier}', [CellierController::class, 'destroy'])->name('cellar.destroy');
+
+    // Ajout manuel de bouteille 
+
     Route::get('/celliers/{cellier}/bouteilles/ajout', [BouteilleManuelleController::class, 'create'])
         ->name('bouteilles.manuelles.create');
 
-    // Traitement du formulaire
     Route::post('/celliers/{cellier}/bouteilles/ajout', [BouteilleManuelleController::class, 'store'])
         ->name('bouteilles.manuelles.store');
 });

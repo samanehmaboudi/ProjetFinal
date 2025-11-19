@@ -13,8 +13,6 @@ use Illuminate\Http\RedirectResponse;
  * 
  * Ce contrôleur gère toutes les opérations CRUD (Create, Read, Update, Delete)
  * liées aux celliers des utilisateurs authentifiés.
- * 
- * @package App\Http\Controllers
  */
 class CellierController extends Controller
 {
@@ -30,9 +28,10 @@ class CellierController extends Controller
         $user = Auth::user();
 
         $celliers = $user->celliers()
-            ->orderByDesc('date_creation')
+            ->orderByDesc('created_at')
             ->get();
 
+        // NOTE : le projet utilise la vue "cellar.index"
         return view('cellar.index', compact('celliers'));
     }
 
@@ -59,12 +58,12 @@ class CellierController extends Controller
     {
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
-            'description' => 'nullable|string', // si tu ajoutes ce champ plus tard
+            // 'description' => 'nullable|string',
         ]);
 
         $request->user()->celliers()->create([
-            'nom'           => $validated['nom'],
-            // 'description' => $validated['description'] ?? null, // si tu as cette colonne
+            'nom' => $validated['nom'],
+            // 'description' => $validated['description'] ?? null,
         ]);
 
         return redirect()
@@ -73,7 +72,7 @@ class CellierController extends Controller
     }
 
     /**
-     * Affiche les détails d'un cellier spécifique.
+     * PV-13 : Affiche les détails d'un cellier spécifique avec ses bouteilles.
      * 
      * Vérifie que le cellier appartient bien à l'utilisateur connecté
      * avant d'afficher les détails.
@@ -85,14 +84,15 @@ class CellierController extends Controller
     {
         $this->authorizeCellier($cellier);
 
+        // On charge les bouteilles liées pour la vue principale
+        $cellier->load('bouteilles');
+
+        // On utilise ta vue PV-13
         return view('celliers.show', compact('cellier'));
     }
 
     /**
      * Affiche le formulaire d'édition d'un cellier existant.
-     * 
-     * Vérifie que le cellier appartient bien à l'utilisateur connecté
-     * avant d'afficher le formulaire.
      * 
      * @param Cellier $cellier Le cellier à modifier
      * @return View La vue du formulaire d'édition
@@ -106,9 +106,6 @@ class CellierController extends Controller
 
     /**
      * Met à jour un cellier existant dans la base de données.
-     * 
-     * Valide les données du formulaire et met à jour les informations
-     * du cellier. Vérifie que le cellier appartient bien à l'utilisateur connecté.
      * 
      * @param Request $request La requête HTTP contenant les données du formulaire
      * @param Cellier $cellier Le cellier à modifier
@@ -136,9 +133,6 @@ class CellierController extends Controller
     /**
      * Supprime un cellier de la base de données.
      * 
-     * Vérifie que le cellier appartient bien à l'utilisateur connecté
-     * avant de le supprimer.
-     * 
      * @param Cellier $cellier Le cellier à supprimer
      * @return RedirectResponse Redirection vers la liste des celliers avec un message de succès
      */
@@ -156,12 +150,7 @@ class CellierController extends Controller
     /**
      * Vérifie que le cellier appartient bien à l'utilisateur connecté.
      * 
-     * Si le cellier n'appartient pas à l'utilisateur connecté,
-     * une erreur 403 (Forbidden) est générée.
-     * 
      * @param Cellier $cellier Le cellier à vérifier
-     * @return void
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException Si l'utilisateur n'est pas autorisé
      */
     protected function authorizeCellier(Cellier $cellier): void
     {

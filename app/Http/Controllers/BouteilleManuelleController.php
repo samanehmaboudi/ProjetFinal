@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cellier;
-use App\Models\Bouteille; // adapte si le modèle a un autre nom
+use App\Models\Bouteille;
 use Illuminate\Http\Request;
 
 class BouteilleManuelleController extends Controller
 {
     /**
      * Affiche le formulaire d'ajout manuel d'une bouteille
-     * dans un cellier donné.
      */
     public function create(Cellier $cellier)
     {
@@ -24,19 +23,19 @@ class BouteilleManuelleController extends Controller
      */
     public function store(Request $request, Cellier $cellier)
     {
-        // Validation des champs (adapte les noms/colonnes selon ta migration)
+        // 1) Validation des champs
         $validated = $request->validate([
-            'nom'        => 'required|string|max:255',
-            'pays'       => 'nullable|string|max:255',
-            'format'     => 'nullable|string|max:50',
-            'quantite'   => 'required|integer|min:1',
-            'prix'       => ['required', 'numeric', 'between:0,9999.99'],
+            'nom'      => 'required|string|max:255',
+            'pays'     => 'nullable|string|max:255',
+            'format'   => 'nullable|string|max:50',
+            'quantite' => 'required|integer|min:1',
+            'prix'     => ['required', 'numeric', 'between:0,9999.99'],
         ]);
 
-        // S'assurer que le prix est bien en décimal (2 chiffres après la virgule)
+        // 2) Prix forcé en décimal (2 chiffres après la virgule)
         $prixDecimal = number_format($validated['prix'], 2, '.', '');
 
-        // Création de la bouteille dans ce cellier
+        // 3) Création de la bouteille liée à ce cellier
         Bouteille::create([
             'cellier_id' => $cellier->id,
             'nom'        => $validated['nom'],
@@ -46,8 +45,9 @@ class BouteilleManuelleController extends Controller
             'prix'       => $prixDecimal,
         ]);
 
+        // 4) Redirection vers la liste des celliers
         return redirect()
-            ->route('celliers.show', $cellier->id) // ou celliers.index selon votre design
+            ->route('celliers.index')
             ->with('success', 'Bouteille ajoutée manuellement avec succès.');
     }
 }

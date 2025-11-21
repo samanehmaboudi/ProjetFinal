@@ -1,113 +1,162 @@
 @extends('layouts.app')
 
-@section('title', $cellier->nom)
+@section('title', 'Mon cellier – ' . $cellier->nom)
+
+{{-- On masque éventuellement le bouton "Ajouter un vin" par défaut du layout --}}
+@section('add-wine-btn', '')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 pt-20">
-    <div class="max-w-4xl mx-auto p-4">
-
+<div class="min-h-screen bg-background pt-24">
+    <div class="max-w-5xl mx-auto space-y-6">
         {{-- En-tête du cellier --}}
-        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 flex items-center justify-between flex-col sm:flex-row gap-4">
+        <div class="bg-card border border-border-base rounded-xl shadow-md p-6 flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">
+                <h1 class="text-2xl font-bold text-text-title">
                     {{ $cellier->nom }}
                 </h1>
-                <p class="text-gray-500">
-                    Bouteilles dans ce cellier.
+                <p class="text-sm text-text-muted">
+                    Vue principale du cellier – liste des bouteilles.
                 </p>
             </div>
 
-            <a href="{{ route('bouteilles.manuelles.create', $cellier) }}"
-               class="bg-red-800 hover:bg-red-900 text-white font-bold py-3 px-8 rounded-full transition">
+            <a
+                href="{{ route('bouteilles.manuelles.create', $cellier->id) }}"
+                class="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-primary-hover transition"
+            >
                 Ajouter une bouteille
             </a>
         </div>
 
         {{-- Liste des bouteilles --}}
-        <div class="space-y-6">
-            @if($cellier->bouteilles->isEmpty())
-                <div class="bg-white rounded-2xl shadow-lg p-16 text-center text-gray-500">
-                    Aucune bouteille pour le moment.
-                </div>
+        <div class="bg-card border border-border-base rounded-xl shadow-md p-6">
+            @if ($cellier->bouteilles->isEmpty())
+                <p class="text-text-muted">
+                    Ce cellier est encore vide. Utilisez le bouton « Ajouter une bouteille » pour commencer.
+                </p>
             @else
-                @foreach($cellier->bouteilles as $bouteille)
-                    <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800">
-                                {{ $bouteille->nom }}
-                            </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach ($cellier->bouteilles as $bouteille)
+                        <div
+                            class="border border-border-base rounded-lg p-4 flex flex-col gap-3"
+                            data-bottle-id="{{ $bouteille->id }}"
+                        >
+                            <div class="flex items-center justify-between gap-2">
+                                <h2 class="font-semibold text-text-title">
+                                    {{ $bouteille->nom }}
+                                </h2>
 
-                            <div class="text-gray-600 space-y-1 mt-2">
-                                @if($bouteille->pays)
-                                    <p>Pays : {{ $bouteille->pays }}</p>
-                                @endif
-
-                                @if($bouteille->format)
-                                    <p>Format : {{ $bouteille->format }}</p>
-                                @endif
-
-                                @if($bouteille->prix !== null)
-                                    <p>Prix : {{ number_format($bouteille->prix, 2, ',', ' ') }} $</p>
-                                @endif
-                            </div>
-                        </div>
-
-                        {{-- Boutons quantité et actions --}}
-                        <div class="flex items-center gap-4">
-                            {{-- Bouton - --}}
-                            <button type="button"
-                                    class="qty-btn w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-2xl font-thin shadow-md transition"
-                                    data-url="{{ route('bouteilles.quantite.update', [$cellier, $bouteille]) }}"
-                                    data-direction="down"
-                                    data-bouteille="{{ $bouteille->id }}">
-                                −
-                            </button>
-
-                            {{-- Affichage quantité --}}
-                            <div class="qty-display bg-red-800 text-white font-bold text-lg px-6 py-2 rounded-full min-w-20 text-center shadow-lg"
-                                 data-bouteille="{{ $bouteille->id }}">
-                                x {{ $bouteille->quantite ?? 1 }}
-                            </div>
-
-                            {{-- Bouton + --}}
-                            <button type="button"
-                                    class="qty-btn w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-2xl font-thin shadow-md transition"
-                                    data-url="{{ route('bouteilles.quantite.update', [$cellier, $bouteille]) }}"
-                                    data-direction="up"
-                                    data-bouteille="{{ $bouteille->id }}">
-                                +
-                            </button>
-
-                            {{-- Boutons Modifier et Supprimer --}}
-                            <div class="flex items-center gap-2 ml-4">
-                                <a 
-                                    href="{{ route('bouteilles.edit', [$cellier, $bouteille]) }}"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm"
-                                >
-                                    Modifier
-                                </a>
-                                
-                                <form 
-                                    action="{{ route('bouteilles.delete', [$cellier, $bouteille]) }}" 
-                                    method="POST" 
-                                    class="inline"
-                                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette bouteille ?');"
-                                >
-                                    @csrf
-                                    @method('DELETE')
-                                    <button 
-                                        type="submit"
-                                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm"
+                                {{-- Contrôles quantité + badge (compatibles avec ton JS ET futur JS API) --}}
+                                <div class="flex items-center gap-2">
+                                    {{-- Bouton - --}}
+                                    <button
+                                        type="button"
+                                        class="qty-btn bottle-qty-minus inline-flex items-center justify-center w-7 h-7 rounded-full border border-border-base text-primary hover:bg-primary/10"
+                                        data-url="{{ route('bouteilles.quantite.update', [$cellier, $bouteille]) }}"
+                                        data-direction="down"
+                                        data-bouteille="{{ $bouteille->id }}"
+                                        data-qty-btn
+                                        data-cellier-id="{{ $cellier->id }}"
+                                        data-bottle-id="{{ $bouteille->id }}"
                                     >
-                                        Supprimer
+                                        –
                                     </button>
-                                </form>
+
+                                    {{-- Badge quantité --}}
+                                    <div
+                                        class="qty-display bottle-qty-value inline-flex items-center justify-center rounded-full bg-primary text-white text-xs px-2 py-0.5 min-w-16 text-center"
+                                        data-bouteille="{{ $bouteille->id }}"
+                                        data-qty-value="{{ $bouteille->id }}"
+                                    >
+                                        x {{ $bouteille->quantite ?? 1 }}
+                                    </div>
+
+                                    {{-- Bouton + --}}
+                                    <button
+                                        type="button"
+                                        class="qty-btn bottle-qty-plus inline-flex items-center justify-center w-7 h-7 rounded-full border border-border-base text-primary hover:bg-primary/10"
+                                        data-url="{{ route('bouteilles.quantite.update', [$cellier, $bouteille]) }}"
+                                        data-direction="up"
+                                        data-bouteille="{{ $bouteille->id }}"
+                                        data-qty-btn
+                                        data-cellier-id="{{ $cellier->id }}"
+                                        data-bottle-id="{{ $bouteille->id }}"
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Informations --}}
+                            <div class="text-sm text-text-muted space-y-1">
+                                @if ($bouteille->pays)
+                                    <p>
+                                        <span class="font-medium text-text-body">Pays :</span>
+                                        {{ $bouteille->pays }}
+                                    </p>
+                                @endif
+
+                                @if ($bouteille->format)
+                                    <p>
+                                        <span class="font-medium text-text-body">Format :</span>
+                                        {{ $bouteille->format }}
+                                    </p>
+                                @endif
+
+                                @if (!is_null($bouteille->prix))
+                                    <p>
+                                        <span class="font-medium text-text-body">Prix :</span>
+                                        {{ number_format($bouteille->prix, 2, ',', ' ') }} $
+                                    </p>
+                                @endif
+                            </div>
+
+                            {{-- Actions --}}
+                            <div class="flex gap-2 mt-auto">
+                                <x-delete-btn 
+                                    :route="route('bouteilles.delete', [
+                                        'cellier'   => $cellier->id,
+                                        'bouteille' => $bouteille->id,
+                                    ])"
+                                />
+
+                                @if ($bouteille->code_saq === null)
+                                    <x-edit-btn
+                                        :route="route('bouteilles.edit', [$cellier->id, $bouteille->id])"
+                                        label="Modifier"
+                                    />
+                                @endif
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             @endif
         </div>
+    </div>
+</div>
+
+{{-- Fenêtre flottante "Ajouter un vin" --}}
+<div
+    id="addWineBtnContainer"
+    class="fixed z-10 bottom-0 left-0 w-full p-4 pt-10 bg-card border border-border-base shadow-lg rounded-t-lg transform translate-y-full transition-transform duration-300"
+>
+    <span class="flex items-center justify-between mb-4">
+        <h1 class="text-3xl text-heading font-heading">Ajouter un vin</h1>
+        <x-dynamic-component :component="'lucide-x'" id="closeAddWine" class="w-6 h-6" />
+    </span>
+
+    <div class="flex flex-col gap-4">
+        <x-icon-text-btn
+            :href="route('bouteilles.manuelles.create', $cellier->id)"
+            icon="wine"
+            title="Explorer le catalogue SAQ"
+            subtitle="Recherchez des vins répertoriés à la SAQ."
+        />
+        <x-icon-text-btn
+            :href="route('bouteilles.manuelles.create', $cellier->id)"
+            icon="notebook-pen"
+            title="Ajouter manuellement"
+            subtitle="Pour les vins non répertoriés à la SAQ."
+        />
     </div>
 </div>
 @endsection

@@ -17,21 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
     closeBtn.addEventListener("click", closeSheet);
 
     // Ouvrir le sheet quand on clique sur Ajouter
-    addToCellarBtns.forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault();
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".add-to-cellar-btn");
+        if (!btn) return; // pas un bouton ajouter
 
-            const form = btn.closest("form");
+        e.preventDefault();
 
-            activeBottleId = form.querySelector(
-                'input[name="bottle_id"]'
-            ).value;
-            activeQuantity =
-                parseInt(form.querySelector('input[name="quantity"]').value) ||
-                1;
+        const form = btn.closest("form");
 
-            openSheet();
-        });
+        activeBottleId = form.querySelector('input[name="bottle_id"]').value;
+        activeQuantity =
+            parseInt(form.querySelector('input[name="quantity"]').value) || 1;
+
+        openSheet();
     });
 
     async function openSheet() {

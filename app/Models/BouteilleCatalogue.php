@@ -36,6 +36,29 @@ class BouteilleCatalogue extends Model
         ];
     }
 
+    /**
+     * Accessor pour obtenir l'URL complète de l'image formatée.
+     * Permet d'utiliser $bouteille->image au lieu de $bouteille->url_image
+     * avec la normalisation du chemin.
+     */
+    public function getImageAttribute()
+    {
+        if (!$this->url_image) {
+            return null;
+        }
+
+        // Normaliser le chemin : enlever tous les préfixes storage/ et / au début
+        $imagePath = ltrim($this->url_image, '/');
+        
+        // Enlever tous les préfixes "storage/" jusqu'à ce qu'il n'y en ait plus
+        while (str_starts_with($imagePath, 'storage/')) {
+            $imagePath = substr($imagePath, 8); // Enlever "storage/" (8 caractères)
+        }
+        
+        // Ajouter storage/ une seule fois et utiliser asset() pour générer l'URL complète
+        return asset('storage/' . $imagePath);
+    }
+
     // Relations Eloquent
     public function pays()
     {

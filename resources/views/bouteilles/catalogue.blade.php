@@ -6,6 +6,7 @@
 <x-search-filter :pays="$pays" :types="$types" />
  <div id="catalogueContainer">
         @include('bouteilles._catalogue_list', ['bouteilles' => $bouteilles])
+
 </div>
 </section>
 <x-modal-pick-cellar />

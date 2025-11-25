@@ -1,5 +1,8 @@
 <div>
-    {{-- La grille --}}
+<p class="mb-2 text-md">
+    <span class="font-semibold">{{ $count }}</span> résultat{{ $count > 1 ? 's' : '' }} trouvé{{ $count > 1 ? 's' : '' }}
+</p>   
+ {{-- La grille --}}
     <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
         @forelse ($bouteilles as $bouteille)
             <x-bouteille-card-block 

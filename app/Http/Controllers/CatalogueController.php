@@ -19,7 +19,9 @@ class CatalogueController extends Controller
         $pays = Pays::orderBy('nom')->get();
         $types = TypeVin::orderBy('nom')->get();
 
-        return view('bouteilles.catalogue', compact('bouteilles', 'pays', 'types'));
+        $count = $bouteilles->total();
+
+        return view('bouteilles.catalogue', compact('bouteilles', 'pays', 'types', 'count'));
     }
 
     public function search(Request $request)
@@ -39,9 +41,10 @@ class CatalogueController extends Controller
         }
 
         $bouteilles = $query->paginate(10);
+        $count = $bouteilles->total();
 
         return response()->json([
-            'html' => view('bouteilles._catalogue_list', compact('bouteilles'))->render()
+            'html' => view('bouteilles._catalogue_list', compact('bouteilles', 'count'))->render()
         ]);
     }
 
@@ -73,5 +76,24 @@ class CatalogueController extends Controller
             'bouteilleCatalogue' => $bouteilleCatalogue,
             'donnees' => $donnees,
         ]);
+    }
+
+    // Suggestions de recherche pour l'autocomplétion
+    public function suggest(Request $request)
+    {
+        // Récupérer le terme de recherche depuis la requête
+        $search = $request->search;
+
+        // Si la requête est trop courte, retourner une réponse vide
+        if (!$search) {
+            return response()->json([]);
+        }
+
+        // Rechercher les bouteilles correspondant au terme
+        $results = BouteilleCatalogue::where('nom', 'like', '%' . $search . '%')
+            ->limit(10)
+            ->get(['id', 'nom']);
+
+        return response()->json($results);
     }
 }

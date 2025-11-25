@@ -29,8 +29,13 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::middleware('auth')->group(function () {
     Route::get('/', [CatalogueController::class, 'index'])->name('bouteille.catalogue');
 
+    // Catalogue de bouteilles
     Route::get('/catalogue/search', [CatalogueController::class, 'search'])
         ->name('catalogue.search');
+
+    // Suggestions de recherche
+    Route::get('/catalogue/suggest', [CatalogueController::class, 'suggest']);
+
 
     // Détails d'une bouteille du catalogue
     Route::get('/catalogue/{bouteilleCatalogue}', [CatalogueController::class, 'show'])
@@ -65,7 +70,7 @@ Route::middleware('auth')->group(function () {
         return $user = auth()->user()->celliers()->withCount('bouteilles')->get();
     })->name('api.celliers');
 
-    
+
     // Recherche des bouteilles dans un cellier.
     Route::get('/celliers/{cellier}/search', [CellierController::class, 'search'])
         ->name('celliers.search');
@@ -78,7 +83,7 @@ Route::middleware('auth')->group(function () {
         '/celliers/{cellier}/bouteilles/{bouteille}/quantite',
         [BouteilleManuelleController::class, 'updateQuantite']
     )->name('bouteilles.manuelles.quantite');
-    
+
     // Suppression de bouteille dans un cellier
     Route::delete('/celliers/{cellier}/bouteilles/{bouteille}', [CellierController::class, 'deleteBottle'])
         ->name('bouteilles.delete');

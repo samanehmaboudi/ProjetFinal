@@ -5,11 +5,17 @@
 
 {{-- Composant de recherche et filtres --}}
 <div {{ $attributes->merge(['class' => 'mt-4']) }}>
+    <div class="relative w-full">
     <x-input 
         type="text" 
         name="searchInput"
         placeholder="Rechercher..." 
     />
+    {{-- Boite de suggestions de recherche --}}
+    <div id="suggestionsBox" class="absolute left-0 right-0 bg-white border border-border-base rounded-lg shadow-md hidden z-50 h-50 overflow-y-auto">
+    </div>
+    </div>
+    
     <div class="flex gap-3 my-4 flex-wrap">
         <select id="paysFilter" class="border px-3 py-2 rounded-lg">
             <option value="">Toutes les Pays</option>

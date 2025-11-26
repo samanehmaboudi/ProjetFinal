@@ -1,27 +1,54 @@
-// Recherche dynamique dans un cellier
+// Recherche + filtres dans le CELLER
 
-const cellarSearchInput      = document.getElementById("cellarSearchInput");
-const cellarPaysFilter       = document.getElementById("cellarPaysFilter");
-const cellarTypeFilter       = document.getElementById("cellarTypeFilter");
-const cellarMillesimeFilter  = document.getElementById("cellarMillesimeFilter");
-const cellarContainer        = document.getElementById("cellarBottlesContainer");
-const cellarSearchBar        = document.getElementById("cellar-search-bar");
+const cellarSearchBar       = document.getElementById("cellar-search-bar");
+const cellarContainer       = document.getElementById("cellarBottlesContainer");
 
-// On vérifie que l'on est bien sur la page du cellier
-if (
-    cellarSearchInput &&
-    cellarPaysFilter &&
-    cellarTypeFilter &&
-    cellarMillesimeFilter &&
-    cellarContainer &&
-    cellarSearchBar
-) {
-    const baseSearchUrl    = cellarSearchBar.dataset.searchUrl;   
-    const currentSort      = cellarSearchBar.dataset.sort;       
-    const currentDirection = cellarSearchBar.dataset.direction;   
+const cellarSearchInput     = document.getElementById("cellarSearchInput");
+const cellarPaysFilter      = document.getElementById("cellarPaysFilter");
+const cellarTypeFilter      = document.getElementById("cellarTypeFilter");
+const cellarMillesimeFilter = document.getElementById("cellarMillesimeFilter");
 
-    // Même idée que le debounce du catalogue
-    function debounceCellar(fn, delay = 300) {
+// Panneau de filtres (UI façon catalogue)
+const cellarSortOptionsBtn   = document.getElementById("cellarSortOptionsBtn");
+const cellarFiltersContainer = document.getElementById("cellarFiltersContainer");
+const cellarFiltersOverlay   = document.getElementById("cellarFiltersOverlay");
+const cellarDragHandle       = document.getElementById("cellarDragHandle");
+const cellarResetFiltersBtn  = document.getElementById("resetCellarFilters");
+const closeCellarFiltersBtn  = document.getElementById("closeCellarFilters");
+
+if (cellarSearchBar && cellarContainer) {
+    console.log("cellier-search.js chargé ✅");
+
+    const baseSearchUrl    = cellarSearchBar.dataset.searchUrl;
+    const currentSort      = cellarSearchBar.dataset.sort || "nom";
+    const currentDirection = cellarSearchBar.dataset.direction || "asc";
+
+    // --- TOGGLE PANNEAU FILTRES (simple : juste hidden / pas hidden) ---
+    function openCellarFilters() {
+        if (cellarFiltersOverlay)   cellarFiltersOverlay.classList.remove("hidden");
+        if (cellarFiltersContainer) cellarFiltersContainer.classList.remove("hidden");
+    }
+
+    function closeCellarFilters() {
+        if (cellarFiltersOverlay)   cellarFiltersOverlay.classList.add("hidden");
+        if (cellarFiltersContainer) cellarFiltersContainer.classList.add("hidden");
+    }
+
+    if (cellarSortOptionsBtn) {
+        cellarSortOptionsBtn.addEventListener("click", openCellarFilters);
+    }
+    if (cellarDragHandle) {
+        cellarDragHandle.addEventListener("click", closeCellarFilters);
+    }
+    if (cellarFiltersOverlay) {
+        cellarFiltersOverlay.addEventListener("click", closeCellarFilters);
+    }
+    if (closeCellarFiltersBtn) {
+        closeCellarFiltersBtn.addEventListener("click", closeCellarFilters);
+    }
+
+    // --- DEBOUNCE ---
+    function debounce(fn, delay = 300) {
         let timer;
         return (...args) => {
             clearTimeout(timer);
@@ -29,18 +56,18 @@ if (
         };
     }
 
+    // --- FETCH DES BOUTEILLES DU CELLIER ---
     function fetchCellar(url) {
         const params = new URLSearchParams({
-            nom:       cellarSearchInput.value,
-            pays:      cellarPaysFilter.value,
-            type:      cellarTypeFilter.value,
-            millesime: cellarMillesimeFilter.value,
+            nom:       cellarSearchInput     ? cellarSearchInput.value     : "",
+            pays:      cellarPaysFilter      ? cellarPaysFilter.value      : "",
+            type:      cellarTypeFilter      ? cellarTypeFilter.value      : "",
+            millesime: cellarMillesimeFilter ? cellarMillesimeFilter.value : "",
             sort:      currentSort,
             direction: currentDirection,
         });
 
         const baseUrl = url || baseSearchUrl;
-
         const finalUrl = baseUrl.includes("?")
             ? `${baseUrl}&${params.toString()}`
             : `${baseUrl}?${params.toString()}`;
@@ -53,15 +80,36 @@ if (
             });
     }
 
-    const debouncedCellarFetch = debounceCellar(fetchCellar, 300);
+    const debouncedFetchCellar = debounce(fetchCellar, 300);
 
-    // Événements sur les champs de recherche
-    cellarSearchInput.addEventListener("input", () => debouncedCellarFetch());
-    cellarPaysFilter.addEventListener("input", () => debouncedCellarFetch());
-    cellarTypeFilter.addEventListener("input", () => debouncedCellarFetch());
-    cellarMillesimeFilter.addEventListener("input", () => debouncedCellarFetch());
+    // --- Écouteurs sur les champs de recherche / filtres ---
+    if (cellarSearchInput) {
+        cellarSearchInput.addEventListener("input", () => debouncedFetchCellar());
+    }
+    if (cellarPaysFilter) {
+        cellarPaysFilter.addEventListener("input", () => debouncedFetchCellar());
+    }
+    if (cellarTypeFilter) {
+        cellarTypeFilter.addEventListener("input", () => debouncedFetchCellar());
+    }
+    if (cellarMillesimeFilter) {
+        cellarMillesimeFilter.addEventListener("input", () => debouncedFetchCellar());
+    }
 
-    // Pagination AJAX dans le cellier (si un jour on ajoute de la pagination)
+    // --- Reset des filtres ---
+    function resetCellarFilters() {
+        if (cellarSearchInput)     cellarSearchInput.value = "";
+        if (cellarPaysFilter)      cellarPaysFilter.value = "";
+        if (cellarTypeFilter)      cellarTypeFilter.value = "";
+        if (cellarMillesimeFilter) cellarMillesimeFilter.value = "";
+        fetchCellar();
+    }
+
+    if (cellarResetFiltersBtn) {
+        cellarResetFiltersBtn.addEventListener("click", resetCellarFilters);
+    }
+
+    // --- Pagination AJAX (si un jour vous ajoutez page= dans l'URL) ---
     function bindCellarPaginationLinks() {
         const links = cellarContainer.querySelectorAll("a[href*='page=']");
         links.forEach((link) => {
@@ -72,5 +120,6 @@ if (
         });
     }
 
+    // Premier binding
     bindCellarPaginationLinks();
 }

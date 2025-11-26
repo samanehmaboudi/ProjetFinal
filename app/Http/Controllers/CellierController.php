@@ -311,14 +311,16 @@ class CellierController extends Controller
             abort(403, 'Impossible de modifier une bouteille provenant du catalogue SAQ.');
         }
 
-        $validated = $request->validate([
-            'nom'        => 'required|string|max:255',
-            'quantite'   => 'required|integer|min:0',
-            'format'     => 'nullable|string|max:25',
-            'pays'       => 'nullable|string|max:100',
-            'type'       => 'nullable|string|max:100',
-            // 'commentaire'=> 'nullable|string|max:1000',
-        ]);
+         $validated = $request->validate([
+        'nom'         => 'required|string|max:255',
+        'quantite'    => 'required|integer|min:0',
+        'format'      => 'nullable|string|max:25',
+        'pays'        => 'nullable|string|max:100',
+        'millesime'  => 'nullable|string|max:10',
+        'type'        => 'nullable|string|max:100',
+        'prix'        => 'nullable|numeric|min:0',
+        'commentaire' => 'nullable|string|max:1000',
+    ]);
 
         $bouteille->update($validated);
 

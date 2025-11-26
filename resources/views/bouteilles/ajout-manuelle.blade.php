@@ -12,7 +12,7 @@
                 undertitle="Remplissez le formulaire ci-dessous pour ajouter une bouteille manuellement à votre cellier." 
             />
 
-            {{-- Formulaire (TON code, gardé tel quel) --}}
+            {{-- Formulaire --}}
             <form
                 id="form-bouteille-manuelle"
                 method="POST"
@@ -28,6 +28,7 @@
                     name="nom"
                     :required="true"
                     placeholder="Ex : Château X"
+                    value="{{ old('nom') }}"
                 />
 
                 {{-- Pays --}}
@@ -35,6 +36,7 @@
                     label="Pays"
                     name="pays"
                     placeholder="Ex : France"
+                    value="{{ old('pays') }}"
                 />
 
                 {{-- Format --}}
@@ -42,6 +44,24 @@
                     label="Format"
                     name="format"
                     placeholder="Ex : 750 ml"
+                    value="{{ old('format') }}"
+                />
+
+                {{-- Type --}}
+                <x-input
+                    label="Type"
+                    name="type"
+                    placeholder="Ex : Rouge"
+                    value="{{ old('type') }}"
+                />
+
+                {{-- Millésime --}}
+                <x-input
+                    label="Millésime"
+                    name="millesime"
+                    type="number"
+                    placeholder="Ex : 2018"
+                    value="{{ old('millesime') }}"
                 />
 
                 {{-- Quantité (obligatoire) --}}
@@ -51,15 +71,18 @@
                     type="number"
                     :required="true"
                     placeholder="Ex : 1"
+                    value="{{ old('quantite') }}"
                 />
 
                 {{-- Prix (obligatoire, décimal) --}}
                 <x-input
                     label="Prix"
                     name="prix"
-                    type="text"
+                    type="number"
+                    step="0.01"
                     :required="true"
                     placeholder="Ex : 12.50"
+                    value="{{ old('prix') }}"
                 />
 
                 <div class="pt-4 flex justify-between">
@@ -73,6 +96,4 @@
         </div>
     </section>
 </div>
-
-{{-- ton script JS de validation reste pareil --}}
 @endsection

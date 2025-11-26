@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app') 
 
 @section('content')
 {{-- Formulaire de modification manuelle d'une bouteille --}}
@@ -48,6 +48,23 @@
                     value="{{ old('format', $bouteille->format) }}"
                 />
 
+                {{-- Type --}}
+                <x-input
+                    label="Type"
+                    name="type"
+                    placeholder="Ex : Rouge"
+                    value="{{ old('type', $bouteille->type) }}"
+                />
+
+                {{-- Millésime --}}
+                <x-input
+                    label="Millésime"
+                    name="millesime"
+                    type="number"
+                    placeholder="Ex : 2018"
+                    value="{{ old('millesime', $bouteille->millesime) }}"
+                />
+
                 {{-- Quantité (obligatoire) --}}
                 <x-input
                     label="Quantité"
@@ -62,7 +79,8 @@
                 <x-input
                     label="Prix"
                     name="prix"
-                    type="text"
+                    type="number"
+                    step="0.01"
                     :required="true"
                     placeholder="Ex : 12.50"
                     value="{{ old('prix', $bouteille->prix) }}"
@@ -79,6 +97,4 @@
         </div>
     </section>
 </div>
-
-
 @endsection

@@ -30,10 +30,10 @@ class BouteilleManuelleController extends Controller
      * 1) Validation des données envoyées par le formulaire
      * 2) Normalisation du prix en format décimal (2 décimales)
      * 3) Création de l'enregistrement Bouteille lié au cellier
-     * 4) Redirection avec message de succès
+     * 4) Redirection vers la page du cellier avec message de succès
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Cellier        $cellier
+     * @param  \App\Models\Cellier      $cellier
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, Cellier $cellier)
@@ -41,37 +41,45 @@ class BouteilleManuelleController extends Controller
         // 1) Validation des champs provenant du formulaire
         $validated = $request->validate([
             // Nom obligatoire, chaîne de caractères, longueur maximale 255
-            'nom'      => 'required|string|max:255',
+            'nom'       => 'required|string|max:255',
+
             // Pays optionnel
-            'pays'     => 'nullable|string|max:255',
+            'pays'      => 'nullable|string|max:255',
+
             // Format (bouteille, magnum, etc.) optionnel
-            'format'   => 'nullable|string|max:50',
+            'format'    => 'nullable|string|max:50',
+
             // Quantité obligatoire, entier minimum 1
-            'quantite' => 'required|integer|min:1',
+            'quantite'  => 'required|integer|min:1',
+
             // Prix obligatoire, numérique et limité à 0-9999.99
-            'prix'     => ['required', 'numeric', 'between:0,9999.99'],
+            'prix'      => ['required', 'numeric', 'between:0,9999.99'],
+
+            // BUG-13 : nouveaux champs facultatifs
+            'type'      => 'nullable|string|max:100',
+            'millesime' => 'nullable|integer',
         ]);
 
         // 2) Forcer le format du prix en décimal avec 2 chiffres après la virgule
-        // number_format retourne une chaîne, mais ici c'est acceptable
         $prixDecimal = number_format($validated['prix'], 2, '.', '');
 
         // 3) Création de la bouteille associée au cellier
-        // Utilise le model Bouteille et la méthode create (remplissage massif)
         Bouteille::create([
             'cellier_id' => $cellier->id,
             'nom'        => $validated['nom'],
-            // Si le champ est absent, on enregistre null
             'pays'       => $validated['pays'] ?? null,
             'format'     => $validated['format'] ?? null,
             'quantite'   => $validated['quantite'],
             'prix'       => $prixDecimal,
+
+            // BUG-13 : on enregistre aussi le type et le millésime
+            'type'       => $validated['type'] ?? null,
+            'millesime'  => $validated['millesime'] ?? null,
         ]);
 
-        // 4) Redirection vers l'index des celliers avec message flash de succès
+        // 4) BUG-9 : redirection vers la page du cellier, pas vers l'index
         return redirect()
-            // Remarque : la route 'cellar.show' est commentée ; on redirige vers 'cellar.index'
-            ->route('cellar.index')
+            ->route('cellar.show', $cellier->id)
             ->with('success', 'Bouteille ajoutée manuellement avec succès.');
     }
 
@@ -86,15 +94,14 @@ class BouteilleManuelleController extends Controller
      * pour éviter les modifications non autorisées.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Cellier        $cellier
-     * @param  \App\Models\Bouteille     $bouteille
+     * @param  \App\Models\Cellier      $cellier
+     * @param  \App\Models\Bouteille    $bouteille
      * @return \Illuminate\Http\JsonResponse
      */
     public function updateQuantite(Request $request, Cellier $cellier, Bouteille $bouteille)
     {
         // Sécurité : s'assurer que la bouteille appartient bien au cellier
         if ($bouteille->cellier_id !== $cellier->id) {
-            // Retourne une erreur 403 Forbidden si la relation n'est pas correcte
             abort(403);
         }
 

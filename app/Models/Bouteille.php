@@ -42,6 +42,23 @@ class Bouteille extends Model
         return $this->belongsTo(Cellier::class);
     }
 
+    /**
+     * Récupère l'image de la bouteille depuis le catalogue si elle existe.
+     * 
+     * @return string|null URL de l'image ou null si non trouvée
+     */
+    public function getImageFromCatalogue()
+    {
+        // Cherche une bouteille du catalogue avec le même nom
+        $catalogueBouteille = \App\Models\BouteilleCatalogue::where('nom', $this->nom)->first();
+        
+        if ($catalogueBouteille && $catalogueBouteille->image) {
+            return $catalogueBouteille->image;
+        }
+        
+        return null;
+    }
+
     public function addToCellier(Cellier $cellier, array $attributes)
     {
         

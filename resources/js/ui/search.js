@@ -20,6 +20,8 @@ let suggestionTimeout = null;
 
 // Fonction de reset des filtres
 function resetFilters() {
+    if (!paysFilter || !typeFilter || !millesimeFilter || !priceMinFilter || !priceMaxFilter || !sortFilter || !searchInput) return;
+    
     paysFilter.value = "";
     typeFilter.value = "";
     millesimeFilter.value = "";
@@ -32,6 +34,8 @@ function resetFilters() {
 
 // Fonction de toggle des options de tri
 function toggleSortOptions() {
+    if (!filtersContainer || !filtersOverlay) return;
+    
     if (filtersContainer.classList.contains("hidden")) {
         filtersOverlay.classList.remove("hidden");
 
@@ -55,9 +59,15 @@ function toggleSortOptions() {
 }
 
 // Evenements pour toggle les options de tri
-sortOptionsBtn.addEventListener("click", toggleSortOptions);
-filtersOverlay.addEventListener("click", toggleSortOptions);
-dragHandle.addEventListener("click", toggleSortOptions);
+if (sortOptionsBtn) {
+    sortOptionsBtn.addEventListener("click", toggleSortOptions);
+}
+if (filtersOverlay) {
+    filtersOverlay.addEventListener("click", toggleSortOptions);
+}
+if (dragHandle) {
+    dragHandle.addEventListener("click", toggleSortOptions);
+}
 
 // Debouce, pour limiter la fréquence des appels AJAX lors de la saisie rapide. Ajoute un delais avant de fetch.
 function debounce(fn, delay = 300) {
@@ -70,16 +80,18 @@ function debounce(fn, delay = 300) {
 
 // Fonction principale pour fetch le catalogue avec les filtres
 function fetchCatalogue(url = "/catalogue/search") {
+    if (!container || !searchInput || !sortFilter) return;
+    
     // deconstruction des values du filtre sortBy
     const [sortBy, sortDirection] = sortFilter.value.split("-");
 
     const params = new URLSearchParams({
-        search: searchInput.value,
-        pays: paysFilter.value,
-        type: typeFilter.value,
-        millesime: millesimeFilter.value,
-        prix_min: priceMinFilter.value,
-        prix_max: priceMaxFilter.value,
+        search: searchInput.value || "",
+        pays: paysFilter?.value || "",
+        type: typeFilter?.value || "",
+        millesime: millesimeFilter?.value || "",
+        prix_min: priceMinFilter?.value || "",
+        prix_max: priceMaxFilter?.value || "",
         sort_by: sortBy,
         sort_direction: sortDirection,
     });
@@ -93,15 +105,18 @@ function fetchCatalogue(url = "/catalogue/search") {
     fetch(finalUrl)
         .then((res) => res.json())
         .then((data) => {
-            container.innerHTML = data.html;
-
-            // Re-bind pagination links for AJAX
-            bindPaginationLinks();
+            if (container) {
+                container.innerHTML = data.html;
+                // Re-bind pagination links for AJAX
+                bindPaginationLinks();
+            }
         });
 }
 
 // Rendu des suggestions
 function renderSuggestions(items) {
+    if (!suggestionsBox) return;
+    
     // Si pas de suggestions, cacher la boite
     if (items.length === 0) {
         suggestionsBox.classList.add("hidden");
@@ -136,54 +151,75 @@ function renderSuggestions(items) {
 // Debounced fetch pour le catalogue
 const debouncedFetch = debounce(fetchCatalogue, 300);
 
-// Recherche
-searchInput.addEventListener("input", () => debouncedFetch());
+// Recherche - seulement si les éléments existent
+if (searchInput) {
+    searchInput.addEventListener("input", () => debouncedFetch());
+    
+    searchInput.addEventListener("input", function () {
+        const query = this.value.trim();
 
-millesimeFilter.addEventListener("change", () => debouncedFetch());
+        // Si la requête est trop courte, cacher les suggestions
+        if (query.length < 2) {
+            if (suggestionsBox) {
+                suggestionsBox.classList.add("hidden");
+            }
+            return;
+        }
+        // Effacer le timeout précédent pour debounce des suggestions
+        clearTimeout(suggestionTimeout);
+
+        // Anti spam
+        suggestionTimeout = setTimeout(() => {
+            fetch(`/catalogue/suggest?search=${encodeURIComponent(query)}`)
+                .then((res) => res.json())
+                .then((items) => {
+                    renderSuggestions(items);
+                });
+        }, 150);
+    });
+}
+
+if (millesimeFilter) {
+    millesimeFilter.addEventListener("change", () => debouncedFetch());
+}
 
 // Filtres
-paysFilter.addEventListener("change", () => debouncedFetch());
-typeFilter.addEventListener("change", () => debouncedFetch());
+if (paysFilter) {
+    paysFilter.addEventListener("change", () => debouncedFetch());
+}
+if (typeFilter) {
+    typeFilter.addEventListener("change", () => debouncedFetch());
+}
 
 // Filtres de prix
-priceMinFilter.addEventListener("input", () => debouncedFetch());
-priceMaxFilter.addEventListener("input", () => debouncedFetch());
+if (priceMinFilter) {
+    priceMinFilter.addEventListener("input", () => debouncedFetch());
+}
+if (priceMaxFilter) {
+    priceMaxFilter.addEventListener("input", () => debouncedFetch());
+}
 
-sortFilter.addEventListener("change", () => debouncedFetch());
+if (sortFilter) {
+    sortFilter.addEventListener("change", () => debouncedFetch());
+}
 
 // Reset des filtres
-resetFiltersBtn.addEventListener("click", resetFilters);
-
-searchInput.addEventListener("input", function () {
-    const query = this.value.trim();
-
-    // Si la requête est trop courte, cacher les suggestions
-    if (query.length < 2) {
-        suggestionsBox.classList.add("hidden");
-        return;
-    }
-    // Effacer le timeout précédent pour debounce des suggestions
-    clearTimeout(suggestionTimeout);
-
-    // Anti spam
-    suggestionTimeout = setTimeout(() => {
-        fetch(`/catalogue/suggest?search=${encodeURIComponent(query)}`)
-            .then((res) => res.json())
-            .then((items) => {
-                renderSuggestions(items);
-            });
-    }, 150);
-});
+if (resetFiltersBtn) {
+    resetFiltersBtn.addEventListener("click", resetFilters);
+}
 
 // Clic en dehors de la boite de suggestions pour la cacher
-document.addEventListener("click", (e) => {
-    if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-        suggestionsBox.classList.add("hidden");
-    }
-});
+if (searchInput && suggestionsBox) {
+    document.addEventListener("click", (e) => {
+        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.classList.add("hidden");
+        }
+    });
+}
 
 // AJAX Pagination
 function bindPaginationLinks() {
+    if (!container) return;
     const links = container.querySelectorAll("a[href*='page=']");
     links.forEach((link) => {
         link.addEventListener("click", function (e) {
@@ -194,4 +230,6 @@ function bindPaginationLinks() {
 }
 
 // Lier les liens de pagination au chargement initial
-bindPaginationLinks();
+if (container) {
+    bindPaginationLinks();
+}

@@ -36,6 +36,24 @@
         <x-toast />
         <x-confirm-delete-modal />
         <x-modal-pick-cellar />
+
+        @if(session('success') || session('error'))
+            <script>
+                function afficherToastFlash() {
+                    if (window.showToast) {
+                        @if(session('success'))
+                            window.showToast({!! json_encode(session('success')) !!}, "success");
+                        @endif
+                        @if(session('error'))
+                            window.showToast({!! json_encode(session('error')) !!}, "error");
+                        @endif
+                    } else {
+                        setTimeout(afficherToastFlash, 50);
+                    }
+                }
+                afficherToastFlash();
+            </script>
+        @endif
     </body>
 
     </html>

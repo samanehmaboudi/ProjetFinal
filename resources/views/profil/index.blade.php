@@ -41,5 +41,20 @@
         </form>
     </section>
 
+    {{-- DÉCONNEXION --}}
+    <section class="bg-card p-4 rounded-lg shadow border border-border-base">
+        <h2 class="text-xl font-semibold mb-4">Sécurité</h2>
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button 
+                type="submit"
+                class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+            >
+                Déconnexion
+            </button>
+        </form>
+    </section>
+
 </div>
 @endsection

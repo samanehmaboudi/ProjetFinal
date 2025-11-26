@@ -4,45 +4,50 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Bouteille extends Model
 {
     use HasFactory;
 
+    protected $table = 'bouteilles';
+
     /**
-     * Attributs remplissables en création/mise à jour.
+     * Attributs remplissables en masse.
+     *
+     * On inclut ici tous les champs utilisés dans tes contrôleurs
+     * + ceux ajoutés par les migrations récentes (type, millesime, code_saq, etc.).
      */
     protected $fillable = [
         'cellier_id',
         'nom',
         'pays',
         'type',
+        'millesime',
         'format',
         'quantite',
-        'prix',          
+        'prix',
+        'commentaire',
         'code_saq',
-        'millesime',
         'note_degustation',
         'rating',
     ];
-    /**
-     * Ici on force le prix à être un décimal avec 2 chiffres
-     */
-    protected function casts(): array
-    {
-        return [
-            'prix' => 'decimal:2',
-            'rating' => 'integer',
-        ];
-    }
 
     /**
-     * Relation : cette bouteille appartient à un cellier.
+     * Casts pour certains types.
      */
-    public function cellier()
-    {
-        return $this->belongsTo(Cellier::class);
-    }
+    protected $casts = [
+        'prix'       => 'decimal:2',
+        'quantite'   => 'integer',
+        'millesime'  => 'integer',
+        'rating'     => 'integer',
+    ];
 
-    public function addToCellier(Cellier $cellier, array $attributes) {}
+    /**
+     * Une bouteille appartient à un cellier.
+     */
+    public function cellier(): BelongsTo
+    {
+        return $this->belongsTo(Cellier::class, 'cellier_id');
+    }
 }

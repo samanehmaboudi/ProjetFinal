@@ -25,8 +25,8 @@
         id="cellar-search-bar"
         class="mt-3 mb-4"
         data-search-url="{{ route('celliers.search', $cellier) }}"
-        data-sort="{{ $sort }}"
-        data-direction="{{ $direction }}"
+        data-sort="{{ $sort ?? 'nom' }}"
+        data-direction="{{ $direction ?? 'asc' }}"
     >
         <div class="flex items-center gap-3">
             {{-- Champ recherche plein largeur --}}
@@ -67,7 +67,7 @@
                     Ce cellier est encore vide. Utilisez le bouton « Ajouter une bouteille » pour commencer.
                 </p>
             @else
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     @foreach ($cellier->bouteilles as $bouteille)
                         <a
                             href="{{ route('bouteilles.show', [$cellier, $bouteille]) }}"
@@ -208,7 +208,7 @@
     </div>
 </div>
 
-{{-- OVERLAY des filtres (simple, sans animation compliquée) --}}
+{{-- OVERLAY des filtres --}}
 <div
     id="cellarFiltersOverlay"
     class="fixed inset-0 z-10 bg-black/50 hidden"
@@ -286,14 +286,14 @@
                     name="sort"
                     class="border border-border-base rounded-md px-2 py-2 text-sm bg-background"
                 >
-                    <option value="nom"        {{ $sort === 'nom' ? 'selected' : '' }}>Nom</option>
-                    <option value="pays"       {{ $sort === 'pays' ? 'selected' : '' }}>Pays</option>
-                    <option value="type"       {{ $sort === 'type' ? 'selected' : '' }}>Type</option>
-                    <option value="quantite"   {{ $sort === 'quantite' ? 'selected' : '' }}>Quantité</option>
-                    <option value="format"     {{ $sort === 'format' ? 'selected' : '' }}>Format</option>
-                    <option value="prix"       {{ $sort === 'prix' ? 'selected' : '' }}>Prix</option>
-                    <option value="millesime"  {{ $sort === 'millesime' ? 'selected' : '' }}>Millésime</option>
-                    <option value="date_ajout" {{ $sort === 'date_ajout' ? 'selected' : '' }}>
+                    <option value="nom"        {{ ($sort ?? 'nom') === 'nom' ? 'selected' : '' }}>Nom</option>
+                    <option value="pays"       {{ ($sort ?? 'nom') === 'pays' ? 'selected' : '' }}>Pays</option>
+                    <option value="type"       {{ ($sort ?? 'nom') === 'type' ? 'selected' : '' }}>Type</option>
+                    <option value="quantite"   {{ ($sort ?? 'nom') === 'quantite' ? 'selected' : '' }}>Quantité</option>
+                    <option value="format"     {{ ($sort ?? 'nom') === 'format' ? 'selected' : '' }}>Format</option>
+                    <option value="prix"       {{ ($sort ?? 'nom') === 'prix' ? 'selected' : '' }}>Prix</option>
+                    <option value="millesime"  {{ ($sort ?? 'nom') === 'millesime' ? 'selected' : '' }}>Millésime</option>
+                    <option value="date_ajout" {{ ($sort ?? 'nom') === 'date_ajout' ? 'selected' : '' }}>
                         Date d'ajout
                     </option>
                 </select>
@@ -308,8 +308,8 @@
                     name="direction"
                     class="border border-border-base rounded-md px-2 py-2 text-sm bg-background"
                 >
-                    <option value="asc"  {{ $direction === 'asc' ? 'selected' : '' }}>Croissant</option>
-                    <option value="desc" {{ $direction === 'desc' ? 'selected' : '' }}>Décroissant</option>
+                    <option value="asc"  {{ ($direction ?? 'asc') === 'asc' ? 'selected' : '' }}>Croissant</option>
+                    <option value="desc" {{ ($direction ?? 'asc') === 'desc' ? 'selected' : '' }}>Décroissant</option>
                 </select>
             </div>
 

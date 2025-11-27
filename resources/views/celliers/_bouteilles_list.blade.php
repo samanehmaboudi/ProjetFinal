@@ -4,13 +4,25 @@
     // On accepte soit $bouteilles passé par le contrôleur (search),
     // soit la relation $cellier->bouteilles (show classique)
     $bottles = isset($bouteilles) ? $bouteilles : ($cellier->bouteilles ?? collect());
+
+    // Est-ce qu'il y a au moins un filtre actif dans la requête ?
+    $hasFilters = request()->filled('nom')
+        || request()->filled('pays')
+        || request()->filled('type')
+        || request()->filled('millesime');
 @endphp
 
 <div class="bg-card border border-border-base rounded-xl shadow-md p-6 mt-4">
     @if ($bottles->isEmpty())
-        <p class="text-text-muted">
-            Ce cellier est encore vide. Utilisez le bouton « Ajouter une bouteille » pour commencer.
-        </p>
+        @if ($hasFilters)
+            <p class="text-text-muted">
+                Aucun résultat trouvé pour ces filtres.
+            </p>
+        @else
+            <p class="text-text-muted">
+                Ce cellier est encore vide. Utilisez le bouton « Ajouter une bouteille » pour commencer.
+            </p>
+        @endif
     @else
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             @foreach ($bottles as $bouteille)

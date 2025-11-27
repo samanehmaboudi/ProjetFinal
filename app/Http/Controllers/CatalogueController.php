@@ -13,7 +13,7 @@ class CatalogueController extends Controller
     {
 
         $bouteilles = BouteilleCatalogue::with(['pays', 'typeVin'])
-            ->orderBy('nom')
+            ->orderBy('date_import', 'desc')
             ->paginate(10);
 
         $pays = Pays::orderBy('nom')->get();

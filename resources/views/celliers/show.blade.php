@@ -7,9 +7,20 @@
 
 @section('content')
 <section class="p-4 pt-2">
+    @php
+        $uniqueBottlesCount = $cellier->bouteilles->count();
+        $undertitle = '';
+        if ($uniqueBottlesCount == 0) {
+            $undertitle = 'Aucune bouteille';
+        } elseif ($uniqueBottlesCount == 1) {
+            $undertitle = '1 Bouteille unique';
+        } else {
+            $undertitle = $uniqueBottlesCount . ' Bouteilles uniques';
+        }
+    @endphp
     <x-page-header
         :title="$cellier->nom"
-        :undertitle="$cellier->bouteilles->count() . ' bouteille' . ($cellier->bouteilles->count() > 1 ? 's' : '')"
+        :undertitle="$undertitle"
     />
 
     @php

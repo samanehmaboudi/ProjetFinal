@@ -67,7 +67,7 @@ Route::middleware('auth')->group(function () {
 
     // Pour Recuperer les cellier du user
     Route::get('/api/celliers', function () {
-        return $user = auth()->user()->celliers()->withCount('bouteilles')->get();
+        return $user = auth()->user()->celliers()->withCount('bouteilles')->withSum('bouteilles as total_bouteilles', 'quantite')->get();
     })->name('api.celliers');
 
 

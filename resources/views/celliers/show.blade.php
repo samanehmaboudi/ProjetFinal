@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app') 
 
 @section('title', 'Mon cellier – ' . $cellier->nom)
 
@@ -13,15 +13,14 @@
 
     {{-- Composant de recherche / filtres / tri (mode cellier) --}}
     <x-search-filter
-    :pays="$pays"
-    :types="$types"
-    :millesimes="$millesimes"
-    mode="cellier" 
-    data-search-url="{{ route('celliers.search', $cellier) }}"
-    data-target-container="cellarBottlesContainer"
-    class="mt-3 mb-4"
-/>
-
+        :pays="$pays"
+        :types="$types"
+        :millesimes="$millesimes"
+        mode="cellier" 
+        data-search-url="{{ route('celliers.search', $cellier) }}"
+        data-target-container="cellarBottlesContainer"
+        class="mt-3 mb-4"
+    />
 
     {{-- Conteneur mis à jour par AJAX --}}
     <div id="cellarBottlesContainer">
@@ -32,7 +31,7 @@
 {{-- Fenêtre flottante "Ajouter un vin" --}}
 <div
     id="addWineBtnContainer"
-    class="fixed z-50 bottom-0 left-0 w-full p-4 pt-10 bg-card border border-border-base shadow-lg rounded-t-lg transform translate-y-full transition-transform duration-300"
+    class="fixed z-50 bottom-0 left-0 w-full p-4 py-10 bg-card border border-border-base shadow-lg rounded-t-lg transform translate-y-full transition-transform duration-300"
 >
     <span class="flex items-center justify-between mb-4">
         <h1 class="text-3xl text-heading font-heading">Ajouter un vin</h1>

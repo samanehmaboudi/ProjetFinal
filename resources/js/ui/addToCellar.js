@@ -1,6 +1,7 @@
 const boutonsAjouterCellier = document.querySelectorAll(".add-to-cellar-btn");
 const boutonFermer = document.getElementById("closeAddWine");
 const panneauCellier = document.getElementById("addWineBtnContainer");
+const overlay = document.getElementById("addWineOverlay");
 
 // Vérifier que les éléments existent avant de continuer
 if (boutonFermer && panneauCellier) {
@@ -36,6 +37,7 @@ if (boutonFermer && panneauCellier) {
     async function ouvrirPanneau() {
         panneauCellier.classList.remove("translate-y-full");
         const listeCelliers = document.getElementById("cellar-list");
+        overlay.classList.remove("opacity-0", "pointer-events-none");
 
         if (!celliersPrecharges) {
             afficherChargement(listeCelliers);
@@ -52,6 +54,8 @@ if (boutonFermer && panneauCellier) {
 
     // Fermer le panneau
     function fermerPanneau() {
+        overlay.classList.add("opacity-0", "pointer-events-none");
+
         panneauCellier.classList.add("translate-y-full");
     }
 
@@ -63,7 +67,6 @@ if (boutonFermer && panneauCellier) {
         });
         return reponse.json();
     }
-
 
     // Afficher un message de chargement
     function afficherChargement(container) {
@@ -78,6 +81,15 @@ if (boutonFermer && panneauCellier) {
         const listeCelliers = document.getElementById("cellar-list");
         listeCelliers.innerHTML = "";
 
+        if (celliers.length === 0) {
+            listeCelliers.innerHTML = `
+                <p class="text-gray-400 italic">
+                    Vous n'avez pas encore de cellier. Veuillez en créer un d'abord.
+                </p>
+                <a href="/celliers/create" class="bg-primary text-white px-4 py-2 rounded-lg w-40 text-center">Créer un cellier</a>
+            `;
+            return;
+        }
         celliers.forEach((cellier) => {
             listeCelliers.innerHTML += `
                 <a 
@@ -93,10 +105,11 @@ if (boutonFermer && panneauCellier) {
                                 cellier.nom
                             }</h2>
                             ${
-                                cellier.bouteilles_count == 0
+                                cellier.total_bouteilles == 0 ||
+                                cellier.total_bouteilles === null
                                     ? `<p class="text-gray-400 italic">Aucune bouteille</p>`
-                                    : `${cellier.bouteilles_count} Bouteille${
-                                          cellier.bouteilles_count > 1
+                                    : `${cellier.total_bouteilles} Bouteille${
+                                          cellier.total_bouteilles > 1
                                               ? "s"
                                               : ""
                                       }`
@@ -110,6 +123,9 @@ if (boutonFermer && panneauCellier) {
 
     // Clique sur un cellier dans le panneau
     document.addEventListener("click", async (e) => {
+        // Recharger les celliers pour s'assurer qu'on a les dernières données
+        obtenirCelliers().then((data) => (celliersPrecharges = data));
+
         const boite = e.target.closest(".cellar-box");
         if (!boite || !boite.dataset.cellarId) return;
 

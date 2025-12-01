@@ -115,13 +115,6 @@ Route::middleware('auth')->group(function () {
 });
 
 
-
-Route::patch(
-    '/celliers/{cellier}/bouteilles/{bouteille}/quantite',
-    [BouteilleManuelleController::class, 'updateQuantite']
-)->name('bouteilles.quantite.update');
-
-
 Route::middleware('auth')->group(function () {
 
     // PROFIL

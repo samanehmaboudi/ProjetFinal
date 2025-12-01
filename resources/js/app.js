@@ -58,80 +58,9 @@ window.showToast = function (message, type = "success") {
 };
 
 /* ============================================================
-   MODULE : Gestion de Quantité (mise à jour optimiste)
+   MODULE : Gestion de Quantité
    ------------------------------------------------------------
-   Lorsqu’un usager clique sur + ou −, la quantité change
-   immédiatement à l'écran. Ensuite, on envoie la mise à jour
-   au serveur. Si le serveur refuse (ex : quantité négative),
-   on remet l’ancienne valeur et on affiche un toast d’erreur.
+   La gestion de quantité est maintenant gérée par bottleQuantity.js
+   qui utilise les sélecteurs corrects (.qty-btn, .qty-display)
+   et la route correcte (/celliers/{cellier}/bouteilles/{bouteille}/quantite)
    ============================================================ */
-
-document.querySelectorAll(".bottle").forEach((bottle) => {
-    const id = bottle.dataset.id;
-    const qtyBadge = bottle.querySelector(".quantite");
-    const btnPlus = bottle.querySelector(".btn-plus");
-    const btnMinus = bottle.querySelector(".btn-minus");
-
-    // Cliquer sur + augmente la quantité
-    if (btnPlus) {
-        btnPlus.addEventListener("click", () =>
-            updateQuantity(id, qtyBadge, +1)
-        );
-    }
-
-    // Cliquer sur − diminue la quantité
-    if (btnMinus) {
-        btnMinus.addEventListener("click", () =>
-            updateQuantity(id, qtyBadge, -1)
-        );
-    }
-});
-
-/**
- * Met à jour la quantité d'une bouteille avec une approche optimiste.
- *
- * @param {number} id - Identifiant de la bouteille.
- * @param {HTMLElement} qtyBadge - Badge affichant la quantité.
- * @param {number} delta - +1 ou -1 selon le bouton pressé.
- */
-
-function updateQuantity(id, qtyBadge, delta) {
-    const oldValue = parseInt(qtyBadge.textContent, 10);
-    const newValue = oldValue + delta;
-
-    // On bloque dès le départ les quantités négatives
-    if (newValue < 0) {
-        showToast("Erreur : La quantité ne peut pas être négative.", "error");
-        return;
-    }
-
-    // Mise à jour immédiate à l'écran (optimiste)
-    qtyBadge.textContent = newValue;
-
-    // Envoi de la mise à jour au serveur
-    fetch(`/bouteilles/${id}/quantite`, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector("meta[name='csrf-token']")
-                .content,
-        },
-        body: JSON.stringify({ quantite: newValue }),
-    })
-        .then((res) => res.json())
-        .then((data) => {
-            // Réponse positive → toast de succès
-            if (data.success) {
-                showToast(data.message, "success");
-            } else {
-                // Réponse négative → retour à l’ancienne valeur
-                qtyBadge.textContent = oldValue;
-                showToast(data.message, "error");
-            }
-        })
-        .catch(() => {
-            // Erreur réseau → retour à la valeur précédente
-            qtyBadge.textContent = oldValue;
-            showToast("Erreur serveur. Réessayez plus tard.", "error");
-        });
-}

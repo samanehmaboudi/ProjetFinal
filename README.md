@@ -163,41 +163,54 @@ Tommy Bourgeois
    SESSION_DRIVER=file
    ```
 
+5. **Configurer la localisation (français)**
+   
+   Pour que l'application affiche les messages en français, configurez la locale dans le fichier `.env` :
+   ```env
+   APP_LOCALE=fr
+   APP_FALLBACK_LOCALE=fr
+   APP_FAKER_LOCALE=fr_FR
+   ```
+   
+   **Note** : Les fichiers de traduction sont déjà présents dans `lang/fr/` et `lang/fr.json`. Si certains messages restent en anglais, vérifiez que :
+   - `APP_LOCALE=fr` est bien défini dans `.env`
+   - Les serveurs ont été redémarrés
+
    Créez le fichier de base de données SQLite :
    ```bash
    touch database/database.sqlite
    ```
 
-5. **Exécuter les migrations**
+6. **Exécuter les migrations**
    ```bash
    php artisan migrate
    ```
 
-6. **Installer les dépendances frontend**
+7. **Installer les dépendances frontend**
    ```bash
    npm install
    ```
 
-7. **Créer le lien symbolique pour le stockage**
+8. **Créer le lien symbolique pour le stockage**
    ```bash
    php artisan storage:link
    ```
 
-8. **Lancer le serveur de développement**
+9. **Lancer le serveur de développement**
    ```bash
    php artisan serve
    ```
 
    L'application sera accessible à `http://localhost:8000`
 
-9. **Compiler les assets frontend**
+10. **Compiler les assets frontend**
    ```bash
    npm run build
    # ou pour le développement avec hot-reload
    npm run dev
    ```
 
-10. **Importer le catalogue SAQ (optionnel)**
+11. **Importer le catalogue SAQ (optionnel)**
     ```bash
     php artisan saq:import --limite=10
     ```

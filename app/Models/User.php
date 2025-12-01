@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 namespace App\Models;
 
@@ -26,6 +26,8 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'is_active',
+        'last_login_at',
     ];
 
     /**
@@ -49,6 +51,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
             'is_admin'          => 'boolean',
+            'is_active'         => 'boolean',
+            'last_login_at'     => 'datetime',
         ];
     }
 
@@ -75,5 +79,13 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return (bool) $this->is_admin;
+    }
+
+    /**
+     * Helper pour vérifier si l'usager est actif.
+     */
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
     }
 }

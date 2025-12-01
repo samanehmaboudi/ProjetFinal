@@ -77,12 +77,12 @@ Route::middleware('auth')->group(function () {
 
 
     /**
-     *API de mise à jour rapide de la quantité d’une bouteille manuelle.
+     *API de mise à jour rapide de la quantité d'une bouteille.
      */
     Route::patch(
         '/celliers/{cellier}/bouteilles/{bouteille}/quantite',
         [BouteilleManuelleController::class, 'updateQuantite']
-    )->name('bouteilles.manuelles.quantite');
+    )->name('bouteilles.quantite.update');
 
     // Suppression de bouteille dans un cellier
     Route::delete('/celliers/{cellier}/bouteilles/{bouteille}', [CellierController::class, 'deleteBottle'])

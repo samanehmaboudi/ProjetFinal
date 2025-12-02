@@ -26,6 +26,9 @@
         <main class="bg-body" role="main" aria-label="Contenu principal">
             @yield('content')
         </main>
+        
+        <x-toast />
+        <x-typewriter-toast />
     </body>
 
 </html>

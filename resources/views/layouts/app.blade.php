@@ -40,6 +40,7 @@
         <x-typewriter-toast />
         <x-confirm-delete-modal />
         <x-modal-pick-cellar />
+        <x-share-modal />
 
         @if(session('success') || session('error'))
             <script>

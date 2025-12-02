@@ -98,6 +98,9 @@
                     const container = document.getElementById("typewriter-toast-container");
                     if (!container) return;
                     
+                    // Réduire le z-index du conteneur pour ce toast spécifique
+                    container.style.zIndex = '40'; // Inférieur à la boîte "Ajouter un vin" (z-50)
+                    
                     const toast = document.createElement("div");
                     toast.className = `
                         text-primary font-medium text-base
@@ -113,7 +116,6 @@
                     
                     // Positionner le toast (sera ajusté après l'ajout au DOM)
                     toast.style.position = 'fixed';
-                    toast.style.zIndex = '50';
                     
                     // Premier paragraphe
                     const paragraph1 = document.createElement("p");

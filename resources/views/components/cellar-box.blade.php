@@ -1,11 +1,13 @@
 {{-- Props permis --}}
-@props(['name'=>'Cellier', 'amount' => '0', 'id' => '', 'editable' => true])
+@props(['name'=>'Cellier', 'amount' => '0', 'id' => ''])
 
 <div 
     class="cellar-box relative p-3 bg-card rounded-lg shadow-md border border-border-base hover:shadow-sm transition-all duration-300"
     role="article" 
     aria-labelledby="cellier-title-{{ $id }}"
 >
+    <x-dropdown-action :id="$id" :deleteUrl="route('cellar.destroy', $id)" :editUrl="route('cellar.edit', $id)" />
+
     {{-- Lien cliquable partout --}}
     <a 
         href="/celliers/{{ $id }}" 
@@ -25,18 +27,5 @@
                 <p class="text-gray-600">{{ $amount }} Bouteilles uniques</p>
             @endif
         </div>
-
-        @if ($editable === true)
-                {{-- Boutons : pointer-events-auto pour réactiver les clics --}}
-            <div 
-                class="cellar-action-btns hidden flex gap-2 items-center pointer-events-auto"
-                role="group" 
-                aria-label="Actions pour le cellier {{ $name }}"
-            >
-                <x-edit-btn :route="route('cellar.edit', $id)" />
-                <x-delete-btn :route="route('cellar.destroy', $id)" />
-            </div>    
-        @endif
-        
     </div>
 </div>

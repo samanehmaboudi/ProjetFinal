@@ -7,8 +7,7 @@
 @section('content')
     <section class="p-4 pt-2" aria-label="Gestion de mes celliers">
         {{-- N'affiche pas le bouton modifier si aucun cellier --}}
-        <x-page-header title="Mes Celliers" :actionBtn="$celliers->isNotEmpty()" />
-        
+        <x-page-header title="Mes Celliers" />
         <div 
             class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" 
             role="list" 

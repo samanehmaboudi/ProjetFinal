@@ -5,17 +5,16 @@
     'editUrl' => null,
 ])
 
-{{-- Ajout de 'group' sur le parent --}}
-<div class="group absolute top-0 right-0 z-10 p-2 cursor-pointer">
+<div class="group absolute top-0 right-0 p-2 cursor-pointer z-10 hover:z-[100] focus-within:z-[100]">
 
-    {{-- Bouton Trigger --}}
+    {{-- Bouton --}}
     <button class="cursor-pointer" aria-haspopup="true" aria-label="Options">
         <x-dynamic-component :component="'lucide-more-vertical'" class="w-6 stroke-text-heading"/>
     </button>
 
     {{-- Menu Déroulant --}}
     <div id="dropdownActionBtn-{{ $id }}" 
-        class="hidden group-hover:block group-focus-within:block absolute right-0 z-50 p-2 rounded-lg border border-border-base bg-card min-w-[120px] shadow-lg"
+        class="hidden group-hover:block group-focus-within:block absolute right-0 top-6 z-50 p-2 rounded-lg border border-border-base bg-card min-w-[120px] shadow-lg"
         role="menu"
     >
         {{-- Option Modifier --}}

@@ -14,13 +14,23 @@ class ListeAchatController extends Controller
     public function index()
     {
         $items = auth()->user()
-        ->listeAchat()
-        ->with('bouteilleCatalogue')
-        ->orderBy('achete')
-        ->orderBy('date_ajout', 'desc')
-        ->get();
+            ->listeAchat()
+            ->with('bouteilleCatalogue')
+            ->orderBy('achete')
+            ->orderBy('date_ajout', 'desc')
+            ->paginate(10);
 
-        return view('liste_achat.index', compact('items'));
+        $allItems = auth()->user()
+            ->listeAchat()
+            ->with('bouteilleCatalogue')
+            ->get();
+
+        $totalPrice = $allItems->sum(fn($item) => $item->bouteilleCatalogue->prix * $item->quantite);
+        $totalItem = $allItems->sum(fn($item) => $item->quantite);
+        $avgPrice = $allItems->count() ? $totalPrice / $allItems->count() : 0;
+
+
+        return view('liste_achat.index', compact('items', 'totalPrice', 'totalItem', 'avgPrice'));
     }
 
     /**

@@ -4,9 +4,13 @@
 
 @section('content')
 
-<div class="p-4 pt-24">
+<div class="p-4 lg:p-6 max-w-6xl mx-auto space-y-6">
 
-    <h1 class="text-3xl font-bold mb-6">Ma liste d’achat</h1>
+    {{-- En-tête de page --}}
+    <x-page-header 
+        title="Ma liste d’achat" 
+        undertitle="Planifiez vos futurs achats de bouteilles en ajoutant des articles à votre liste d’achat."
+    />
 
     {{-- État vide --}}
     @if ($items->isEmpty())
@@ -18,98 +22,94 @@
        />
     @endif
 
-
     {{-- Liste d’achat --}}
-    @foreach ($items as $item)
-    @php
-        $b = $item->bouteilleCatalogue;
-    @endphp
+    <section class="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        @foreach ($items as $item)
+            @php
+                $b = $item->bouteilleCatalogue;
+            @endphp
 
-    <div class="bg-white shadow-md rounded-xl p-4 mb-4 flex items-center justify-between border border-gray-100">
+            <div class="relative flex flex-col rounded-2xl border border-gray-200 bg-white/80 shadow-sm 
+                        hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
 
-        {{-- Infos bouteille --}}
-        <div class="flex items-start gap-3">
-
-            {{-- Photo réelle de la bouteille --}}
-            <div class="rounded-lg w-14 h-14 bg-gray-50 flex items-center justify-center overflow-hidden shadow-sm">
-                @if ($b->image)
-                    <img src="{{ $b->image }}" 
-                         alt="Image {{ $b->nom }}"
-                         class="w-full h-full object-contain">
-                @else
-                    <x-dynamic-component 
-                        :component="'lucide-wine'" 
-                        class="w-7 h-7 text-primary opacity-60"
+                {{-- Bouton d’action (menu) --}}
+                    <x-dropdown-action 
+                        :item="$item" 
+                        deleteUrl="{{ route('listeAchat.destroy', $item) }}"
                     />
-                @endif
+
+                {{-- Image --}}
+                <div class="max-h-[160px] bg-gray-50 border-b border-gray-100 flex items-center justify-center 
+                            overflow-hidden aspect-3/4 py-3">
+                    @if ($b->image)
+                        <img src="{{ $b->image }}" 
+                             alt="Image {{ $b->nom }}"
+                             class="max-w-[96px] max-h-[160px] object-contain">
+                    @else
+                        <x-dynamic-component 
+                            :component="'lucide-wine'" 
+                            class="w-7 h-7 text-primary/60"
+                        />
+                    @endif
+                </div>
+
+                {{-- Texte --}}
+                <div class="flex-1 p-4 flex flex-col gap-2">
+                    <p class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">
+                        {{ $b->nom }}
+                    </p>
+
+                    {{-- pays + format --}}
+                    <p class="text-xs text-gray-500">
+                        {{ $b->pays->nom ?? 'Pays inconnu' }} — 
+                        {{ $b->volume ?? 'Format inconnu' }}
+                    </p>
+
+                    {{-- prix / quantité / sous-total --}}
+                    <div class="mt-2 space-y-1 text-xs">
+                        <p class="text-gray-600">
+                            Prix : <span class="font-semibold">{{ number_format($b->prix, 2, ',', ' ') }} $</span>
+                        </p>
+
+                        <p class="text-gray-600">
+                            Quantité : <span class="font-semibold">{{ $item->quantite }}</span>
+                        </p>
+
+                        <p class="text-gray-700">
+                            Sous-total : 
+                            <span class="font-semibold">
+                                {{ number_format($b->prix * $item->quantite, 2, ',', ' ') }} $
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
             </div>
-
-            {{-- Texte --}}
-            <div>
-                <p class="font-semibold text-gray-800 text-sm leading-tight">
-                    {{ $b->nom }}
-                </p>
-
-                {{-- pays + format (corrigé) --}}
-                <p class="text-xs text-gray-500 mt-1">
-                    {{ $b->pays->nom ?? 'Pays inconnu' }} — 
-                    {{ $b->volume ?? 'Format inconnu' }}
-                </p>
-
-                {{-- prix --}}
-                <p class="text-xs text-gray-600 mt-1">
-                    Prix : 
-                    <span class="font-semibold">
-                        {{ number_format($b->prix, 2, ',', ' ') }} $
-                    </span>
-                </p>
-
-                {{-- quantité --}}
-                <p class="text-xs text-gray-600">
-                    Quantité : <span class="font-semibold">{{ $item->quantite }}</span>
-                </p>
-
-                {{-- sous-total --}}
-                <p class="text-xs text-gray-700 mt-1">
-                    Sous-total : 
-                    <span class="font-semibold">
-                        {{ number_format($b->prix * $item->quantite, 2, ',', ' ') }} $
-                    </span>
-                </p>
-            </div>
-        </div>
-
-        {{-- Bouton supprimer --}}
-        <form method="POST" action="{{ route('listeAchat.destroy', $item) }}">
-            @csrf
-            @method('DELETE')
-
-            <button 
-                class="flex items-center gap-1 text-red-600 text-sm font-semibold hover:text-red-700 transition"
-            >
-                <x-dynamic-component component="lucide-trash-2" class="w-4 h-4" />
-                Supprimer
-            </button>
-        </form>
-
+        @endforeach
+    </section>
+    {{-- Pagination --}}
+    <div class="mt-6 flex-1 w-full ">
+        {{ $items->links() }}
     </div>
-    @endforeach
 
-
-    {{-- Total (si items présents) --}}
+    {{-- Total --}}
     @if (!$items->isEmpty())
-        @php
-            $total = $items->sum(fn($i) => $i->quantite * ($i->bouteilleCatalogue->prix ?? 0));
-        @endphp
-
-        <div class="mt-8 bg-gray-200 text-gray-900 p-5 rounded-2xl shadow-md text-center">
-    <p class="text-xl font-bold">
-        Total estimé : {{ number_format($total, 2, ',', ' ') }} $
-    </p>
-</div>
-
+        <div class="mt-8 text-gray-900">
+            <p class="text-lg md:text-xl">
+                Nombre de bouteilles : 
+                <span class="font-bold">{{ $totalItem }}</span>
+            </p>
+             <p class="text-lg md:text-xl">
+                Prix moyen par bouteille: 
+                <span class="font-bold">{{ number_format($avgPrice, 2, ',', ' ') }} $</span>
+            </p>
+            <p class="text-lg md:text-xl">
+                Total : 
+                <span class="font-bold">{{ number_format($totalPrice, 2, ',', ' ') }} $</span>
+            </p>
+            
+        </div>
     @endif
-
 </div>
 
 @endsection

@@ -20,6 +20,23 @@
 {{-- Carte de bouteille --}}
 <div class='relative flex flex-col justify-between bg-card rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden' role="article" aria-label="Carte de la bouteille {{ $nom }}">
     
+    {{-- BOUTON PANIER : Ajouter à la liste d’achat --}}
+    @if($isCatalogueMode)
+    <button 
+        type="button"
+        class="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-md 
+               p-2 rounded-full transition z-20 add-to-wishlist"
+        data-id="{{ $id }}"
+        aria-label="Ajouter à la liste d’achat"
+    >
+        <x-dynamic-component 
+            :component="'lucide-shopping-cart'" 
+            class="w-5 h-5 text-primary"
+        />
+    </button>
+    @endif
+
+    {{-- Menu actions en mode cellier --}}
     @if($isCellierMode)
         <x-dropdown-action 
             :id="$bouteilleId" 
@@ -145,7 +162,7 @@
                     >
                         Ajouter
                     </button>
-                </form>
+                </form>    
             </div>
         @endif
     </div>

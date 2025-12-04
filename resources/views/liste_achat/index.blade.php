@@ -126,6 +126,15 @@
                         </button>
 
                     </div>
+                    {{-- Bouton transférer --}}
+                    <button
+                        type="button"
+                        class="wishlist-transfer-btn mt-2 text-xs px-3 py-1 rounded-full 
+                               bg-primary/10 text-primary hover:bg-primary/20 transition"
+                        data-item-id="{{ $item->id }}"
+                        data-url="{{ route('listeAchat.transfer', $item) }}">
+                        Transférer au cellier
+                    </button>
                 </div>
             </div>
 

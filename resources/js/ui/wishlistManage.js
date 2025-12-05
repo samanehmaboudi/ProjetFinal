@@ -4,7 +4,7 @@ const wishlistButtons = document.querySelectorAll(".wishlist-qty-btn");
 if (wishlistButtons.length) {
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
-    
+
     // Ajout des écouteurs d'événements aux boutons
     wishlistButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -29,12 +29,14 @@ if (wishlistButtons.length) {
             }
 
             const oldText = display.textContent;
-            
+
             // Marquer comme en cours de chargement
             display.dataset.loading = "true";
-            
+
             // Indicateur de chargement (Spinner)
-            const spinnerTemplate = document.getElementById("spinner-inline-template");
+            const spinnerTemplate = document.getElementById(
+                "spinner-inline-template"
+            );
             if (spinnerTemplate) {
                 const clone = spinnerTemplate.content.cloneNode(true);
                 display.innerHTML = "";
@@ -49,7 +51,7 @@ if (wishlistButtons.length) {
                     ></div>
                 `;
             }
-            
+
             // Appel API pour mettre à jour la quantité (PATCH avec direction comme le cellier)
             fetch(url, {
                 method: "PATCH",
@@ -76,54 +78,57 @@ if (wishlistButtons.length) {
                     }
                     // Réinitialiser le flag de chargement
                     display.dataset.loading = "false";
+                    showToast("Quantité mise à jour", "success");
+                    refreshStats();
                 })
                 .catch((err) => {
                     console.error("Erreur quantité:", err);
                     display.textContent = oldText;
                     // Réinitialiser le flag de chargement en cas d'erreur
                     display.dataset.loading = "false";
+                    showToast("Erreur réseau", "error");
                 });
         });
     });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
-/* ============================================================
+    /* ============================================================
        CHECKBOX : MARQUER COMME ACHETÉ
        ============================================================ */
-document.querySelectorAll(".wishlist-check-achete").forEach((checkbox) => {
-    if (checkbox.dataset.jsBound === "true") return;
-    checkbox.dataset.jsBound = "true";
+    document.querySelectorAll(".wishlist-check-achete").forEach((checkbox) => {
+        if (checkbox.dataset.jsBound === "true") return;
+        checkbox.dataset.jsBound = "true";
 
-    checkbox.addEventListener("change", () => {
-        const formData = new FormData();
-        formData.append("_method", "PUT");
-        formData.append("achete", checkbox.checked ? 1 : 0);
+        checkbox.addEventListener("change", () => {
+            const formData = new FormData();
+            formData.append("_method", "PUT");
+            formData.append("achete", checkbox.checked ? 1 : 0);
 
-        fetch(checkbox.dataset.url, {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector(
-                    'meta[name="csrf-token"]'
-                ).content,
-                Accept: "application/json",
-            },
-            body: formData,
-        })
-            .then((res) => {
-                // Style barré
-                const label = checkbox.parentElement.querySelector("span");
-
-                if (checkbox.checked) {
-                    label.classList.add("line-through", "text-gray-400");
-                } else {
-                    label.classList.remove("line-through", "text-gray-400");
-                }
-
-                showToast("Statut mis à jour", "success");
+            fetch(checkbox.dataset.url, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector(
+                        'meta[name="csrf-token"]'
+                    ).content,
+                    Accept: "application/json",
+                },
+                body: formData,
             })
-            .catch(() => showToast("Erreur réseau", "error"));
+                .then((res) => {
+                    // Style barré
+                    const label = checkbox.parentElement.querySelector("span");
+
+                    if (checkbox.checked) {
+                        label.classList.add("line-through", "text-gray-400");
+                    } else {
+                        label.classList.remove("line-through", "text-gray-400");
+                    }
+
+                    showToast("Statut mis à jour", "success");
+                })
+                .catch(() => showToast("Erreur réseau", "error"));
+        });
     });
 });
 

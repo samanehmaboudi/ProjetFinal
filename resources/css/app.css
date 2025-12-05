@@ -24,10 +24,10 @@
     --color-button-default: #ebebeb;
     --color-button-hover: var(--color-primary);
 
-    --color-icon: var(--color-neutral-600);
-    --color-icon-hover: var(--color-neutral-800);
+    --color-icon: var(--color-neutral-700);
+    --color-icon-hover: var(--color-neutral-900);
 
-    --color-danger: #ef4444;
+    --color-danger: #b32e2e;
     --color-danger-hover: #dc2626;
     --color-danger-active: #b91c1c;
 
@@ -130,8 +130,14 @@
 
 /* Animation clignotante pour le curseur typewriter */
 @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+    0%,
+    50% {
+        opacity: 1;
+    }
+    51%,
+    100% {
+        opacity: 0;
+    }
 }
 
 .typewriter-cursor {
@@ -162,11 +168,9 @@
     transform: rotate(-15deg);
 }
 
-
 .text-button-default {
-    color: #7a1634; 
+    color: #7a1634;
 }
-
 
 @custom-viewport --bp-750 (width >= 750px);
 
@@ -197,7 +201,8 @@
 
 /* Animation de border clignotant rouge vin pour les tips */
 @keyframes flashBorder {
-    0%, 100% {
+    0%,
+    100% {
         border-color: #7a1f3d;
         box-shadow: 0 0 0 0 rgba(122, 31, 61, 0.4);
     }
@@ -208,7 +213,8 @@
 }
 
 @keyframes flashBorderSvg {
-    0%, 100% {
+    0%,
+    100% {
         outline-color: #7a1f3d;
         outline-offset: 2px;
         box-shadow: 0 0 0 0 rgba(122, 31, 61, 0.4);

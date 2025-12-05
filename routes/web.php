@@ -153,6 +153,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/liste-achat/{item}/transfer', [ListeAchatController::class, 'transfer'])
         ->name('listeAchat.transfer');
 
+    Route::get('/liste-achat/search', [ListeAchatController::class, 'search'])
+        ->name('listeAchat.search');
+
+    // Suggestions de recherche
+    Route::get('/liste-achat/suggest', [ListeAchatController::class, 'suggest']);
+
+
     Route::get('/api/listeAchat/stats', function () {
 
         $user = Auth::user();

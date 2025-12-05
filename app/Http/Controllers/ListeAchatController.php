@@ -6,6 +6,10 @@ use App\Models\ListeAchat;
 use App\Models\BouteilleCatalogue;
 use App\Models\Bouteille;
 use Illuminate\Http\Request;
+use App\Models\Pays;
+use App\Models\TypeVin;
+use App\Models\Region;
+
 
 class ListeAchatController extends Controller
 {
@@ -35,8 +39,17 @@ class ListeAchatController extends Controller
         $totalItem = $allItems->sum(fn($item) => (int)($item->quantite ?? 0));
         $avgPrice = $allItems->count() ? $totalPrice / $allItems->count() : 0;
 
+        $pays = Pays::all();
+        $types = TypeVin::all();
+        $regions = Region::all();
+        $millesimes = BouteilleCatalogue::select('millesime')
+            ->whereNotNull('millesime')
+            ->distinct()
+            ->orderBy('millesime', 'desc')
+            ->get();
 
-        return view('liste_achat.index', compact('items', 'totalPrice', 'totalItem', 'avgPrice'));
+
+        return view('liste_achat.index', compact('items', 'totalPrice', 'totalItem', 'avgPrice', 'pays', 'types', 'regions', 'millesimes'));
     }
 
     /**
@@ -91,7 +104,7 @@ class ListeAchatController extends Controller
 
         // Vérifier que le cellier appartient à l'utilisateur
         $cellier = $user->celliers()->find($cellierId);
-        
+
         if (!$cellier) {
             return response()->json([
                 'success' => false,
@@ -102,7 +115,7 @@ class ListeAchatController extends Controller
         $quantite = $item->quantite;
         // Charger la bouteille du catalogue avec ses relations nécessaires
         $bouteilleCatalogue = $item->bouteilleCatalogue;
-        
+
         // Charger les relations si elles ne sont pas déjà chargées
         if (!$bouteilleCatalogue->relationLoaded('pays')) {
             $bouteilleCatalogue->load('pays');
@@ -135,7 +148,7 @@ class ListeAchatController extends Controller
             $nouvelleBouteille->quantite = $quantite;
             $nouvelleBouteille->prix = $bouteilleCatalogue->prix;
             $nouvelleBouteille->code_saq = $bouteilleCatalogue->code_saQ;
-            
+
             // Ajouter type et millésime si disponibles
             if ($bouteilleCatalogue->typeVin) {
                 $nouvelleBouteille->type = $bouteilleCatalogue->typeVin->nom;
@@ -143,7 +156,7 @@ class ListeAchatController extends Controller
             if ($bouteilleCatalogue->millesime) {
                 $nouvelleBouteille->millesime = $bouteilleCatalogue->millesime;
             }
-            
+
             $nouvelleBouteille->save();
         }
 
@@ -207,5 +220,94 @@ class ListeAchatController extends Controller
         $item->delete();
 
         return back()->with('success', 'Élément supprimé de votre liste d’achat.');
+    }
+
+    public function search(Request $request)
+    {
+        $user = auth()->user();
+
+        $query = $user->listeAchat()->with('bouteilleCatalogue');
+
+        // SEARCH TEXT
+        if ($request->search) {
+            $query->whereHas('bouteilleCatalogue', function ($q) use ($request) {
+                $q->where('nom', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // PAYS
+        if ($request->pays) {
+            $query->whereHas('bouteilleCatalogue', function ($q) use ($request) {
+                $q->where('id_pays', $request->pays);
+            });
+        }
+
+        // TYPE
+        if ($request->type) {
+            $query->whereHas('bouteilleCatalogue', function ($q) use ($request) {
+                $q->where('id_type_vin', $request->type);
+            });
+        }
+
+        // REGION
+        if ($request->region) {
+            $query->whereHas('bouteilleCatalogue', function ($q) use ($request) {
+                $q->where('id_region', $request->region);
+            });
+        }
+
+        // MILLÉSIMES
+        if ($request->millesime) {
+            $query->whereHas('bouteilleCatalogue', function ($q) use ($request) {
+                $q->where('millesime', $request->millesime);
+            });
+        }
+
+        // PRIX MIN / MAX
+        if ($request->prix_min || $request->prix_max) {
+            $query->whereHas('bouteilleCatalogue', function ($q) use ($request) {
+                if ($request->prix_min) $q->where('prix', '>=', $request->prix_min);
+                if ($request->prix_max) $q->where('prix', '<=', $request->prix_max);
+            });
+        }
+
+        // SORTING
+        if ($request->sort_by && in_array($request->sort_direction, ['asc', 'desc'])) {
+            $query->whereHas('bouteilleCatalogue', function ($q) use ($request) {
+                $q->orderBy($request->sort_by, $request->sort_direction);
+            });
+        }
+
+        $items = $query->paginate(10);
+        $count = $items->total();
+
+        return response()->json([
+            'html' => view('liste_achat._liste_achat_list', compact('items', 'count'))->render()
+        ]);
+    }
+    // Suggestions de recherche pour l'autocomplétion
+    public function suggest(Request $request)
+    {
+        $search = $request->search;
+
+        if (!$search) {
+            return response()->json([]);
+        }
+
+        $user = auth()->user();
+
+        $results = $user->listeAchat()
+            ->join('bouteille_catalogue', 'liste_achat.bouteille_catalogue_id', '=', 'bouteille_catalogue.id')
+
+            // Filtre
+            ->where('bouteille_catalogue.nom', 'like', '%' . $search . '%')
+
+            // Sélection
+            ->select('bouteille_catalogue.nom')
+            ->distinct()
+            ->limit(10)
+            ->get();
+
+        return response()->json($results);
     }
 }

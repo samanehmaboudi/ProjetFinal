@@ -37,7 +37,7 @@
 
         <x-header :logoPath='asset("images/logo_vino.png")' />
         
-        <main class="bg-body mb-30" role="main" aria-label="Contenu principal">
+        <main class="bg-body mb-30 max-w-6xl mx-auto" role="main" aria-label="Contenu principal">
             @yield('content')
         </main>
         

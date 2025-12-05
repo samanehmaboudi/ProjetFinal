@@ -89,42 +89,41 @@ if (wishlistButtons.length) {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* ============================================================
+/* ============================================================
        CHECKBOX : MARQUER COMME ACHETÉ
        ============================================================ */
-    document.querySelectorAll(".wishlist-check-achete").forEach((checkbox) => {
-        if (checkbox.dataset.jsBound === "true") return;
-        checkbox.dataset.jsBound = "true";
+document.querySelectorAll(".wishlist-check-achete").forEach((checkbox) => {
+    if (checkbox.dataset.jsBound === "true") return;
+    checkbox.dataset.jsBound = "true";
 
-        checkbox.addEventListener("change", () => {
-            const formData = new FormData();
-            formData.append("_method", "PUT");
-            formData.append("achete", checkbox.checked ? 1 : 0);
+    checkbox.addEventListener("change", () => {
+        const formData = new FormData();
+        formData.append("_method", "PUT");
+        formData.append("achete", checkbox.checked ? 1 : 0);
 
-            fetch(checkbox.dataset.url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector(
-                        'meta[name="csrf-token"]'
-                    ).content,
-                    Accept: "application/json",
-                },
-                body: formData,
+        fetch(checkbox.dataset.url, {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector(
+                    'meta[name="csrf-token"]'
+                ).content,
+                Accept: "application/json",
+            },
+            body: formData,
+        })
+            .then((res) => {
+                // Style barré
+                const label = checkbox.parentElement.querySelector("span");
+
+                if (checkbox.checked) {
+                    label.classList.add("line-through", "text-gray-400");
+                } else {
+                    label.classList.remove("line-through", "text-gray-400");
+                }
+
+                showToast("Statut mis à jour", "success");
             })
-                .then((res) => {
-                    // Style barré
-                    const label = checkbox.parentElement.querySelector("span");
-
-                    if (checkbox.checked) {
-                        label.classList.add("line-through", "text-gray-400");
-                    } else {
-                        label.classList.remove("line-through", "text-gray-400");
-                    }
-
-                    showToast("Statut mis à jour", "success");
-                })
-                .catch(() => showToast("Erreur réseau", "error"));
-        });
+            .catch(() => showToast("Erreur réseau", "error"));
     });
 });
 

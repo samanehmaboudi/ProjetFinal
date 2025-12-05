@@ -27,8 +27,8 @@
         $b = $item->bouteilleCatalogue;
         @endphp
 
-        <div class="relative flex flex-col rounded-2xl border border-gray-200 bg-white/80 shadow-sm 
-                        hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+        <div id="bouteille-card" class="relative flex flex-col rounded-2xl border border-gray-200 bg-white/80 shadow-sm 
+                        hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden" data-id="{{ $item->id }}">
 
             {{-- Menu (3 points) --}}
             <x-dropdown-action
@@ -153,7 +153,7 @@
                 {{-- Nombre total de bouteilles --}}
                 <div class="flex flex-col items-center justify-center bg-gray-50 rounded-xl py-4 px-3 border border-gray-100">
                     <span class="text-sm text-gray-500">Nombre de bouteilles</span>
-                    <span class="text-2xl font-bold text-gray-900">
+                    <span id="totalItemContainer" class="text-2xl font-bold text-gray-900">
                         {{ $totalItem }}
                     </span>
                 </div>
@@ -161,7 +161,7 @@
                 {{-- Prix moyen --}}
                 <div class="flex flex-col items-center justify-center bg-gray-50 rounded-xl py-4 px-3 border border-gray-100">
                     <span class="text-sm text-gray-500 whitespace-nowrap">Prix moyen / bouteille</span>
-                    <span class="text-2xl font-bold text-gray-900">
+                    <span id="averagePriceContainer" class="text-2xl font-bold text-gray-900">
                         {{ number_format($avgPrice, 2, ',', ' ') }} $
                     </span>
                 </div>
@@ -169,7 +169,7 @@
                 {{-- Total --}}
                 <div class="flex flex-col items-center justify-center bg-gray-50 rounded-xl py-4 px-3 border border-gray-100">
                     <span class="text-sm text-gray-500">Total estimé</span>
-                    <span class="text-2xl font-bold text-gray-900">
+                    <span id="totalPriceContainer" class="text-2xl font-bold text-gray-900">
                         {{ number_format($totalPrice, 2, ',', ' ') }} $
                     </span>
                 </div>

@@ -20,7 +20,6 @@ import "./ui/wishlistManage";
 import "./ui/wishlistTransfer";
 import "./ui/pageNavigation";
 
-
 /* ============================================================
    MODULE : Toasts – Petites notifications
    ------------------------------------------------------------

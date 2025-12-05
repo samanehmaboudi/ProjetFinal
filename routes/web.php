@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
 
     // API pour trouver une bouteille du catalogue par code SAQ
     Route::get('/api/catalogue/by-code-saq/{codeSaq}', [CatalogueController::class, 'findByCodeSaq']);
-    
+
     // API pour trouver une bouteille du catalogue par nom (fallback)
     Route::get('/api/catalogue/by-name/{nom}', [CatalogueController::class, 'findByName']);
 
@@ -70,10 +70,10 @@ Route::middleware('auth')->group(function () {
         ->name('bouteilles.manuelles.store');
 
     Route::post('/api/ajout/cellier', [CellierController::class, 'ajoutBouteilleApi'])->name('api.ajout.cellier');
-    
+
     // Pour récupérer les celliers du user
     Route::get('/api/celliers', function () {
-        /** @var User $user */   
+        /** @var User $user */
         $user = Auth::user();
 
         return $user->celliers()
@@ -146,10 +146,27 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/liste-achat/{item}', [ListeAchatController::class, 'destroy'])
         ->name('listeAchat.destroy');
-        
+
     Route::post('/liste-achat/{item}/transfer', [ListeAchatController::class, 'transfer'])
-    ->name('listeAchat.transfer');
-    
+        ->name('listeAchat.transfer');
+
+    Route::get('/api/listeAchat/stats', function () {
+
+        $user = Auth::user();
+
+        $items = $user->listeAchat()->with('bouteilleCatalogue')->get();
+
+        $totalPrice = $items->sum(fn($item) => $item->bouteilleCatalogue->prix * $item->quantite);
+        $totalItem = $items->sum(fn($item) => $item->quantite);
+        $avgPrice = $items->count() ? $totalPrice / $items->count() : 0;
+
+        return response()->json([
+            'totalItem' => $totalItem,
+            'totalPrice' => $totalPrice,
+            'averagePrice' => $avgPrice,
+        ]);
+    });
+
 
     // PARTAGE
     // Générer un lien de partage unique pour une bouteille

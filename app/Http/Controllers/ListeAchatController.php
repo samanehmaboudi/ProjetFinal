@@ -86,7 +86,7 @@ class ListeAchatController extends Controller
 
         // Vérifier que le cellier appartient à l'utilisateur
         $cellier = $user->celliers()->find($cellierId);
-        
+
         if (!$cellier) {
             return response()->json([
                 'success' => false,
@@ -97,7 +97,7 @@ class ListeAchatController extends Controller
         $quantite = $item->quantite;
         // Charger la bouteille du catalogue avec ses relations nécessaires
         $bouteilleCatalogue = $item->bouteilleCatalogue;
-        
+
         // Charger les relations si elles ne sont pas déjà chargées
         if (!$bouteilleCatalogue->relationLoaded('pays')) {
             $bouteilleCatalogue->load('pays');
@@ -130,7 +130,7 @@ class ListeAchatController extends Controller
             $nouvelleBouteille->quantite = $quantite;
             $nouvelleBouteille->prix = $bouteilleCatalogue->prix;
             $nouvelleBouteille->code_saq = $bouteilleCatalogue->code_saQ;
-            
+
             // Ajouter type et millésime si disponibles
             if ($bouteilleCatalogue->typeVin) {
                 $nouvelleBouteille->type = $bouteilleCatalogue->typeVin->nom;
@@ -138,7 +138,7 @@ class ListeAchatController extends Controller
             if ($bouteilleCatalogue->millesime) {
                 $nouvelleBouteille->millesime = $bouteilleCatalogue->millesime;
             }
-            
+
             $nouvelleBouteille->save();
         }
 

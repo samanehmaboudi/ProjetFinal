@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="p-4 lg:p-6 max-w-6xl mx-auto space-y-6">
+<div class="p-4 lg:p-6 space-y-6">
 
     {{-- En-tête de page --}}
     <x-page-header

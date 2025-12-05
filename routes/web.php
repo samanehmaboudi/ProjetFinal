@@ -156,7 +156,7 @@ Route::middleware('auth')->group(function () {
 
         $items = $user->listeAchat()->with('bouteilleCatalogue')->get();
 
-        $totalPrice = $items->sum(fn($item) => $item->bouteilleCatalogue->prix * $item->quantite);
+        $totalPrice = $items->sum(fn($item) => $item->bouteilleCatalogue->prix *  $item->quantite);
         $totalItem = $items->sum(fn($item) => $item->quantite);
         $avgPrice = $items->count() ? $totalPrice / $items->count() : 0;
 

@@ -1,12 +1,13 @@
 // Gestion des quantités de bouteilles dans la cave
-// Sélection des boutons de quantité
-const buttons = document.querySelectorAll(".qty-btn");
-if (buttons.length) {
-    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-    const csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
-    // Ajout des écouteurs d'événements aux boutons
-    buttons.forEach((btn) => {
-        btn.addEventListener("click", () => {
+function initBottleQuantity() {
+    // Sélection des boutons de quantité
+    const buttons = document.querySelectorAll(".qty-btn");
+    if (buttons.length) {
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute("content") : "";
+        // Ajout des écouteurs d'événements aux boutons
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
             const url = btn.dataset.url;
             const direction = btn.dataset.direction;
             const bouteilleId = btn.dataset.bouteille;
@@ -82,7 +83,14 @@ if (buttons.length) {
                     // Réinitialiser le flag de chargement en cas d'erreur
                     display.dataset.loading = "false";
                 });
+            });
         });
-    });
+    }
 }
+
+// Initialisation au chargement
+initBottleQuantity();
+
+// Réinitialisation après un chargement AJAX du cellier
+window.addEventListener("cellierReloaded", initBottleQuantity);
 

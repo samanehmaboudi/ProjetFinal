@@ -128,7 +128,9 @@ document.addEventListener("DOMContentLoaded", () => {
             .then((res) => res.json())
             .then((data) => {
                 container.innerHTML = data.html;
-                bindPaginationLinks(); 
+                bindPaginationLinks();
+                // Réinitialiser les boutons de quantité après le chargement AJAX
+                window.dispatchEvent(new CustomEvent("cellierReloaded"));
             })
             .catch((err) => console.error("Erreur fetch cellier :", err));
     }

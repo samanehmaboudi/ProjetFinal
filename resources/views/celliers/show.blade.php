@@ -91,7 +91,7 @@
                         addWineBtn.classList.add('flash-border-red-wine');
                         setTimeout(function() {
                             addWineBtn.classList.remove('flash-border-red-wine');
-                        }, 12000);
+                        }, 18000);
                     }
                     
                     // Créer un toast personnalisé avec deux paragraphes
@@ -102,50 +102,75 @@
                     container.style.zIndex = '40'; // Inférieur à la boîte "Ajouter un vin" (z-50)
                     
                     const toast = document.createElement("div");
-                    toast.className = `
-                        text-primary font-medium text-base
-                        animate-fade-in
-                        relative
+                    toast.className = "typewriter-toast-item";
+                    toast.style.cssText = `
+                        position: fixed;
+                        max-width: 400px;
+                        min-width: 250px;
+                        background: white;
+                        border: 2px solid #d1d5db;
+                        border-radius: 12px;
+                        padding: 16px 20px;
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                        z-index: 9999;
+                        pointer-events: auto;
+                        opacity: 0;
+                        transform: translateY(20px) scale(0.95);
+                        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 0.5rem;
+                        text-align: center;
                     `;
-                    toast.style.display = 'flex';
-                    toast.style.flexDirection = 'column';
-                    toast.style.alignItems = 'flex-end';
-                    toast.style.gap = '0.5rem';
-                    toast.style.maxWidth = '384px';
-                    toast.style.textAlign = 'right';
-                    
-                    // Positionner le toast (sera ajusté après l'ajout au DOM)
-                    toast.style.position = 'fixed';
                     
                     // Premier paragraphe
                     const paragraph1 = document.createElement("p");
-                    paragraph1.className = "typewriter-text handwriting-text";
-                    paragraph1.style.fontFamily = '"Caveat", cursive';
-                    paragraph1.style.fontSize = '1.5rem';
-                    paragraph1.style.fontWeight = '500';
-                    paragraph1.style.letterSpacing = '0.03em';
-                    paragraph1.style.display = 'inline-block';
-                    paragraph1.style.margin = '0';
+                    paragraph1.className = "typewriter-text-content";
+                    paragraph1.style.cssText = `
+                        font-family: "Caveat", cursive;
+                        font-size: 1.3rem;
+                        font-weight: 500;
+                        color: #7a1f3d;
+                        letter-spacing: 0.03em;
+                        line-height: 1.4;
+                        display: block;
+                        word-wrap: break-word;
+                        margin: 0;
+                    `;
                     
                     // Deuxième paragraphe
                     const paragraph2 = document.createElement("p");
-                    paragraph2.className = "typewriter-text handwriting-text";
-                    paragraph2.style.fontFamily = '"Caveat", cursive';
-                    paragraph2.style.fontSize = '1.5rem';
-                    paragraph2.style.fontWeight = '500';
-                    paragraph2.style.letterSpacing = '0.03em';
-                    paragraph2.style.display = 'inline-block';
-                    paragraph2.style.margin = '0';
+                    paragraph2.className = "typewriter-text-content";
+                    paragraph2.style.cssText = `
+                        font-family: "Caveat", cursive;
+                        font-size: 1.3rem;
+                        font-weight: 500;
+                        color: #7a1f3d;
+                        letter-spacing: 0.03em;
+                        line-height: 1.4;
+                        display: block;
+                        word-wrap: break-word;
+                        margin: 0;
+                    `;
                     
                     toast.appendChild(paragraph1);
                     toast.appendChild(paragraph2);
                     container.appendChild(toast);
                     container.style.display = "block";
                     
-                    // Positionner le toast à gauche du bouton "Ajouter +" ou à 20% depuis la droite
+                    // Animation d'entrée fluide
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            toast.style.opacity = "1";
+                            toast.style.transform = "translateY(0) scale(1)";
+                        });
+                    });
+                    
+                    // Positionner le toast à gauche du bouton "Ajouter +"
                     if (addWineBtn) {
                         const btnRect = addWineBtn.getBoundingClientRect();
-                        const toastWidth = 384;
+                        const toastWidth = 400;
                         const spacing = 20; // Espace entre le toast et le bouton
                         // Positionner le toast à gauche du bouton (le bord droit du toast à gauche du bouton)
                         const toastRight = window.innerWidth - btnRect.left + spacing;
@@ -156,73 +181,107 @@
                         toast.style.bottom = (window.innerHeight - btnRect.bottom) + 'px';
                         toast.style.right = calculatedRight + 'px';
                     } else {
-                        // Fallback: 20% depuis la droite
-                        toast.style.bottom = '100px';
-                        toast.style.right = '20%';
+                        // Fallback: bas à droite
+                        toast.style.bottom = '20px';
+                        toast.style.right = '20px';
                     }
                     
-                    // Animer le premier paragraphe
+                    // Animer le premier paragraphe avec requestAnimationFrame (comme les autres)
                     const message1 = "Cliquez ici pour ajouter";
                     const message2 = "votre première bouteille!";
                     
                     let index1 = 0;
-                    const writeParagraph1 = () => {
+                    let lastTime1 = performance.now();
+                    let animationFrameId1 = null;
+                    const speed = 40;
+                    
+                    const writeParagraph1 = (currentTime) => {
                         if (index1 < message1.length) {
-                            const char = message1[index1];
-                            paragraph1.textContent += char;
-                            index1++;
+                            const elapsed = currentTime - lastTime1;
                             
-                            let nextDelay = 60;
+                            // Calculer le délai basé sur le caractère
+                            let charDelay = speed;
+                            const char = message1[index1];
+                            
                             if (char === ',' || char === '.' || char === '!' || char === '?') {
-                                nextDelay = 60 * 2.5;
+                                charDelay = speed * 2;
                             } else if (char === ' ') {
-                                nextDelay = 60 * 1.5;
+                                charDelay = speed * 1.2;
                             } else {
-                                nextDelay = 60 * (0.8 + Math.random() * 0.4);
+                                charDelay = speed * (0.9 + Math.random() * 0.2);
                             }
                             
-                            setTimeout(writeParagraph1, nextDelay);
+                            if (elapsed >= charDelay) {
+                                paragraph1.textContent += char;
+                                index1++;
+                                lastTime1 = currentTime;
+                            }
+                            
+                            animationFrameId1 = requestAnimationFrame(writeParagraph1);
                         } else {
-                            // Commencer le deuxième paragraphe après une petite pause
+                            // Commencer le deuxième paragraphe après 2 secondes
                             setTimeout(() => {
                                 let index2 = 0;
-                                const writeParagraph2 = () => {
+                                let lastTime2 = performance.now();
+                                let animationFrameId2 = null;
+                                
+                                const writeParagraph2 = (currentTime) => {
                                     if (index2 < message2.length) {
-                                        const char = message2[index2];
-                                        paragraph2.textContent += char;
-                                        index2++;
+                                        const elapsed = currentTime - lastTime2;
                                         
-                                        let nextDelay = 60;
+                                        // Calculer le délai basé sur le caractère
+                                        let charDelay = speed;
+                                        const char = message2[index2];
+                                        
                                         if (char === ',' || char === '.' || char === '!' || char === '?') {
-                                            nextDelay = 60 * 2.5;
+                                            charDelay = speed * 2;
                                         } else if (char === ' ') {
-                                            nextDelay = 60 * 1.5;
+                                            charDelay = speed * 1.2;
                                         } else {
-                                            nextDelay = 60 * (0.8 + Math.random() * 0.4);
+                                            charDelay = speed * (0.9 + Math.random() * 0.2);
                                         }
                                         
-                                        setTimeout(writeParagraph2, nextDelay);
+                                        if (elapsed >= charDelay) {
+                                            paragraph2.textContent += char;
+                                            index2++;
+                                            lastTime2 = currentTime;
+                                        }
+                                        
+                                        animationFrameId2 = requestAnimationFrame(writeParagraph2);
                                     } else {
-                                        // Animation terminée, attendre avant de fermer
+                                        // Ajouter un curseur clignotant à la fin
+                                        const cursor = document.createElement("span");
+                                        cursor.textContent = "|";
+                                        cursor.style.cssText = `
+                                            display: inline-block;
+                                            margin-left: 2px;
+                                            animation: blink 1s infinite;
+                                            color: #7a1f3d;
+                                        `;
+                                        paragraph2.appendChild(cursor);
+                                        
+                                        // Animation terminée, attendre avant de fermer (ajout de 2 secondes)
                                         setTimeout(() => {
+                                            // Animation de sortie fluide
                                             toast.style.opacity = "0";
-                                            toast.style.transform = "translateY(-20px)";
-                                            toast.style.transition = "opacity 0.5s, transform 0.5s";
+                                            toast.style.transform = "translateY(20px) scale(0.95)";
+                                            
                                             setTimeout(() => {
                                                 toast.remove();
                                                 if (container.children.length === 0) {
                                                     container.style.display = "none";
                                                 }
-                                            }, 500);
-                                        }, 12000);
+                                            }, 300);
+                                        }, 14000);
                                     }
                                 };
-                                writeParagraph2();
-                            }, 300);
+                                
+                                animationFrameId2 = requestAnimationFrame(writeParagraph2);
+                            }, 2000);
                         }
                     };
                     
-                    writeParagraph1();
+                    animationFrameId1 = requestAnimationFrame(writeParagraph1);
                 }, 500);
             }
             setTimeout(initEmptyCellierToast, 500);

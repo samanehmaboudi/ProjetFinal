@@ -62,7 +62,7 @@
                                 cellierLink.classList.add('flash-border-red-wine');
                                 setTimeout(function() {
                                     cellierLink.classList.remove('flash-border-red-wine');
-                                }, 12000);
+                                }, 8000);
                             }
                             
                             window.showTypewriterToast(
@@ -73,8 +73,9 @@
                                         left: clampedLeft,
                                         transform: 'translateX(-50%)'
                                     },
-                                    speed: 60,
-                                    duration: 12000,
+                                    speed: 40,
+                                    duration: 5500,
+                                    fontSize: '1.3rem',
                                     onComplete: function() {
                                         setTimeout(function() {
                                             const cellierBox = document.getElementById('cellier-{{ $welcomeTipCellierId }}');
@@ -94,32 +95,30 @@
                                                     moreVerticalSvg.classList.add('flash-border-red-wine');
                                                     setTimeout(function() {
                                                         moreVerticalSvg.classList.remove('flash-border-red-wine');
-                                                    }, 10000);
+                                                    }, 7000);
                                                 }
                                                 
                                                 window.showTypewriterToast(
                                                     "Et cliquez ici pour le modifier ou supprimer",
                                                     {
-                                                        position: {
-                                                            top: toastTop,
-                                                            left: clampedLeft,
-                                                            transform: 'translateY(-50%)'
-                                                        },
-                                                        speed: 60,
-                                                        duration: 10000
+                                                        position: 'top-center',
+                                                        speed: 40,
+                                                        duration: 5000,
+                                                        fontSize: '1.3rem'
                                                     }
                                                 );
                                             } else {
                                                 window.showTypewriterToast(
                                                     "Et cliquez ici pour le modifier ou supprimer",
                                                     {
-                                                        position: 'top-right',
-                                                        speed: 60,
-                                                        duration: 10000
+                                                        position: 'top-center',
+                                                        speed: 40,
+                                                        duration: 5000,
+                                                        fontSize: '1.3rem'
                                                     }
                                                 );
                                             }
-                                        }, 200);
+                                        }, 2000);
                                     }
                                 }
                             );

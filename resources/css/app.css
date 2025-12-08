@@ -227,9 +227,13 @@
 }
 
 .flash-border-red-wine {
-    border: 2px solid #7a1f3d;
-    border-radius: 8px;
+    border: 2px solid #7a1f3d !important;
     animation: flashBorder 1s ease-in-out infinite;
+}
+
+/* Préserver le border-radius pour les éléments ronds */
+.rounded-full.flash-border-red-wine {
+    border-radius: 999px !important;
 }
 
 /* Pour les SVG, utiliser outline au lieu de border */

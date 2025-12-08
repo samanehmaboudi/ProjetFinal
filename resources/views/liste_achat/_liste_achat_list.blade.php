@@ -97,12 +97,12 @@
                     {{-- prix / quantité / sous-total --}}
                     <div class="flex flex-col gap-2 text-xs">
                         <p class="text-gray-600">
-                            Prix : <span class="font-semibold">{{ number_format($b->prix, 2, ',', ' ') }} $</span>
+                            Prix : <span class="font-semibold" data-item-price="{{ $b->prix }}">{{ number_format($b->prix, 2, ',', ' ') }} $</span>
                         </p>
 
                         <p class="text-gray-700">
                             Sous-total :
-                            <span class="font-semibold">
+                            <span class="font-semibold wishlist-subtotal" data-item-id="{{ $item->id }}">
                                 {{ number_format($b->prix * $item->quantite, 2, ',', ' ') }} $
                             </span>
                         </p>

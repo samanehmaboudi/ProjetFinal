@@ -1,0 +1,286 @@
+[1mdiff --git a/resources/js/ui/search.js b/resources/js/ui/search.js[m
+[1mindex 2d2a607..488c6e3 100644[m
+[1m--- a/resources/js/ui/search.js[m
+[1m+++ b/resources/js/ui/search.js[m
+[36m@@ -1,3 +1,6 @@[m
+[32m+[m[32m// Fichier unifié pour la recherche (catalogue, liste d'achat, et cellier)[m
+[32m+[m[32m// Détecte automatiquement le contexte et adapte le comportement[m
+[32m+[m
+ // Champs du DOM[m
+ const searchInput = document.getElementById("searchInput");[m
+ const paysFilter = document.getElementById("paysFilter");[m
+[36m@@ -11,7 +14,6 @@[m [mconst sortFilter = document.getElementById("sortFilter");[m
+ // Boutons[m
+ const resetFiltersBtn = document.getElementById("resetFiltersBtn");[m
+ const applyFiltersBtn = document.getElementById("applyFiltersBtn");[m
+[31m-const searchWrapper = document.querySelector("[data-container]");[m
+ [m
+ // Bottom sheet filtres[m
+ const sortOptionsBtn = document.getElementById("sortOptionsBtn");[m
+[36m@@ -19,16 +21,34 @@[m [mconst filtersContainer = document.getElementById("filtersContainer");[m
+ const filtersOverlay = document.getElementById("filtersOverlay");[m
+ const dragHandle = document.getElementById("dragHandle");[m
+ [m
+[31m-// Conteneur des cartes (catalogue ou liste d’achat)[m
+[31m-const containerId = searchWrapper?.dataset.container || "catalogueContainer";[m
+[31m-const container = document.getElementById(containerId);[m
+[31m-[m
+[31m-// URL API (catalogue ou liste d’achat)[m
+[31m-const baseUrl = searchWrapper?.dataset.url || "/catalogue/search";[m
+[31m-const suggestionUrl =[m
+[31m-    searchWrapper?.dataset.suggestionUrl || "/catalogue/suggest";[m
+[32m+[m[32m// Détection du contexte[m
+[32m+[m[32m// Cellier : utilise data-search-url et data-target-container[m
+[32m+[m[32mconst cellierRoot = document.querySelector("[data-search-url][data-target-container='cellarBottlesContainer']");[m
+[32m+[m[32m// Catalogue/Liste d'achat : utilise data-container[m
+[32m+[m[32mconst catalogueRoot = document.querySelector("[data-container]");[m
+[32m+[m
+[32m+[m[32mlet isCellier = false;[m
+[32m+[m[32mlet containerId, container, baseUrl, suggestionUrl;[m
+[32m+[m
+[32m+[m[32mif (cellierRoot) {[m
+[32m+[m[32m    // Mode cellier[m
+[32m+[m[32m    isCellier = true;[m
+[32m+[m[32m    containerId = cellierRoot.dataset.targetContainer || "cellarBottlesContainer";[m
+[32m+[m[32m    container = document.getElementById(containerId);[m
+[32m+[m[32m    baseUrl = cellierRoot.dataset.searchUrl;[m
+[32m+[m[32m    suggestionUrl = null; // Pas de suggestions pour le cellier[m
+[32m+[m[32m} else if (catalogueRoot) {[m
+[32m+[m[32m    // Mode catalogue ou liste d'achat[m
+[32m+[m[32m    containerId = catalogueRoot.dataset.container || "catalogueContainer";[m
+[32m+[m[32m    container = document.getElementById(containerId);[m
+[32m+[m[32m    baseUrl = catalogueRoot.dataset.url || "/catalogue/search";[m
+[32m+[m[32m    suggestionUrl = catalogueRoot.dataset.suggestionUrl || "/catalogue/suggest";[m
+[32m+[m[32m} else {[m
+[32m+[m[32m    // Aucun contexte trouvé, on sort[m
+[32m+[m[32m    console.warn("search.js : aucun contexte trouvé (cellier ou catalogue)");[m
+[32m+[m[32m}[m
+ [m
+[31m-// Suggestions[m
+[32m+[m[32m// Suggestions (uniquement pour catalogue/liste d'achat)[m
+ const suggestionsBox = document.getElementById("suggestionsBox");[m
+ let suggestionTimeout = null;[m
+ [m
+[36m@@ -46,11 +66,20 @@[m [mfunction resetFilters() {[m
+     if (millesimeFilter) millesimeFilter.value = "";[m
+     if (priceMinFilter) priceMinFilter.value = "";[m
+     if (priceMaxFilter) priceMaxFilter.value = "";[m
+[31m-    if (sortFilter)[m
+[31m-        sortFilter.value = isListeAchat[m
+[31m-            ? "date_ajout-desc"[m
+[31m-            : "date_import-desc";[m
+[31m-    fetchCatalogue(); // Call sans arg → baseUrl utilisé[m
+[32m+[m[32m    if (sortFilter) {[m
+[32m+[m[32m        if (isCellier) {[m
+[32m+[m[32m            sortFilter.value = "";[m
+[32m+[m[32m        } else {[m
+[32m+[m[32m            sortFilter.value = isListeAchat[m
+[32m+[m[32m                ? "date_ajout-desc"[m
+[32m+[m[32m                : "date_import-desc";[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m[32m    if (isCellier) {[m
+[32m+[m[32m        fetchCellier();[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m        fetchCatalogue();[m
+[32m+[m[32m    }[m
+ }[m
+ [m
+ // Ouverture / fermeture panel[m
+[36m@@ -88,9 +117,71 @@[m [mfunction debounce(fn, delay = 300) {[m
+     };[m
+ }[m
+ [m
+[31m-// Fetch catalogue / liste d’achat[m
+[32m+[m[32m// Traduire "prix-asc", "nom-desc"... pour le backend cellier[m
+[32m+[m[32mfunction buildSortForCellier() {[m
+[32m+[m[32m    if (!sortFilter || !sortFilter.value) {[m
+[32m+[m[32m        return { sort: "nom", direction: "asc" };[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const [sortBy, sortDir] = sortFilter.value.split("-");[m
+[32m+[m[32m    let sort = "nom";[m
+[32m+[m
+[32m+[m[32m    switch (sortBy) {[m
+[32m+[m[32m        case "prix":[m
+[32m+[m[32m            sort = "prix";[m
+[32m+[m[32m            break;[m
+[32m+[m[32m        case "millesime":[m
+[32m+[m[32m            sort = "millesime";[m
+[32m+[m[32m            break;[m
+[32m+[m[32m        case "date_import":[m
+[32m+[m[32m        case "date_ajout":[m
+[32m+[m[32m            sort = "date_ajout";[m
+[32m+[m[32m            break;[m
+[32m+[m[32m        case "nom":[m
+[32m+[m[32m        default:[m
+[32m+[m[32m            sort = "nom";[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const direction = sortDir === "desc" ? "desc" : "asc";[m
+[32m+[m[32m    return { sort, direction };[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// Fetch cellier[m
+[32m+[m[32mfunction fetchCellier(url) {[m
+[32m+[m[32m    if (!container) return;[m
+[32m+[m
+[32m+[m[32m    const { sort, direction } = buildSortForCellier();[m
+[32m+[m
+[32m+[m[32m    const params = new URLSearchParams({[m
+[32m+[m[32m        nom: searchInput?.value || "",[m
+[32m+[m[32m        pays: paysFilter?.value || "",[m
+[32m+[m[32m        type: typeFilter?.value || "",[m
+[32m+[m[32m        region: regionFilter?.value || "",[m
+[32m+[m[32m        millesime: millesimeFilter?.value || "",[m
+[32m+[m[32m        sort,[m
+[32m+[m[32m        direction,[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    if (priceMinFilter?.value) params.append("prix_min", priceMinFilter.value);[m
+[32m+[m[32m    if (priceMaxFilter?.value) params.append("prix_max", priceMaxFilter.value);[m
+[32m+[m
+[32m+[m[32m    const baseUrlFinal = url || baseUrl;[m
+[32m+[m[32m    const finalUrl = baseUrlFinal.includes("?")[m
+[32m+[m[32m        ? `${baseUrlFinal}&${params.toString()}`[m
+[32m+[m[32m        : `${baseUrlFinal}?${params.toString()}`;[m
+[32m+[m
+[32m+[m[32m    fetch(finalUrl)[m
+[32m+[m[32m        .then((res) => res.json())[m
+[32m+[m[32m        .then((data) => {[m
+[32m+[m[32m            container.innerHTML = data.html;[m
+[32m+[m[32m            bindPaginationLinks();[m
+[32m+[m[32m            window.dispatchEvent(new CustomEvent("cellierReloaded"));[m
+[32m+[m[32m        })[m
+[32m+[m[32m        .catch((err) => console.error("Erreur fetch cellier :", err));[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// Fetch catalogue / liste d'achat[m
+ function fetchCatalogue(customUrl = baseUrl) {[m
+[31m-    // customUrl = lien de pagination OU baseUrl[m
+     if (!container) return;[m
+ [m
+     // Tri[m
+[36m@@ -131,9 +222,6 @@[m [mfunction fetchCatalogue(customUrl = baseUrl) {[m
+ [m
+                 // Re-bind pagination links pour AJAX[m
+                 bindPaginationLinks();[m
+[31m-[m
+[31m-                // Rebind les boutons wishlist[m
+[31m-                window.dispatchEvent(new CustomEvent("catalogueReloaded"));[m
+             }[m
+ [m
+             // Masquer l'overlay de chargement après le chargement AJAX[m
+[36m@@ -157,7 +245,7 @@[m [mfunction fetchCatalogue(customUrl = baseUrl) {[m
+         });[m
+ }[m
+ [m
+[31m-// Suggestions recherche[m
+[32m+[m[32m// Suggestions recherche (uniquement catalogue/liste d'achat)[m
+ function renderSuggestions(items) {[m
+     if (!suggestionsBox) return;[m
+ [m
+[36m@@ -182,38 +270,52 @@[m [mfunction renderSuggestions(items) {[m
+         el.addEventListener("click", () => {[m
+             searchInput.value = el.dataset.value;[m
+             suggestionsBox.classList.add("hidden");[m
+[31m-            debouncedFetch(); // Relance fetchCatalogue()[m
+[32m+[m[32m            if (isCellier) {[m
+[32m+[m[32m                debouncedFetchCellier();[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m                debouncedFetchCatalogue();[m
+[32m+[m[32m            }[m
+         });[m
+     });[m
+ }[m
+ [m
+[31m-// DebouncedFetch sans param → fetchCatalogue() utilisera baseUrl[m
+[31m-const debouncedFetch = debounce(() => fetchCatalogue(), 300);[m
+[32m+[m[32m// DebouncedFetch[m
+[32m+[m[32mconst debouncedFetchCatalogue = debounce(() => fetchCatalogue(), 300);[m
+[32m+[m[32mconst debouncedFetchCellier = debounce(() => fetchCellier(), 300);[m
+ [m
+ // Écoute entrée recherche[m
+ if (searchInput) {[m
+[31m-    searchInput.addEventListener("input", () => debouncedFetch());[m
+[31m-[m
+[31m-    searchInput.addEventListener("input", (e) => {[m
+[31m-        const query = e.target.value.trim();[m
+[31m-        if (query.length < 1) {[m
+[31m-            if (suggestionsBox) suggestionsBox.classList.add("hidden");[m
+[31m-            return;[m
+[31m-        }[m
+[32m+[m[32m    if (isCellier) {[m
+[32m+[m[32m        searchInput.addEventListener("input", () => debouncedFetchCellier());[m
+[32m+[m[32m    } else {[m
+[32m+[m[32m        searchInput.addEventListener("input", () => debouncedFetchCatalogue());[m
+[32m+[m
+[32m+[m[32m        // Suggestions (uniquement pour catalogue/liste d'achat)[m
+[32m+[m[32m        searchInput.addEventListener("input", (e) => {[m
+[32m+[m[32m            const query = e.target.value.trim();[m
+[32m+[m[32m            if (query.length < 1) {[m
+[32m+[m[32m                if (suggestionsBox) suggestionsBox.classList.add("hidden");[m
+[32m+[m[32m                return;[m
+[32m+[m[32m            }[m
+ [m
+[31m-        clearTimeout(suggestionTimeout);[m
+[31m-        suggestionTimeout = setTimeout(() => {[m
+[31m-            fetch(`${suggestionUrl}?search=${encodeURIComponent(query)}`)[m
+[31m-                .then((res) => res.json())[m
+[31m-                .then((items) => renderSuggestions(items));[m
+[31m-        }, 150);[m
+[31m-    });[m
+[32m+[m[32m            clearTimeout(suggestionTimeout);[m
+[32m+[m[32m            suggestionTimeout = setTimeout(() => {[m
+[32m+[m[32m                fetch(`${suggestionUrl}?search=${encodeURIComponent(query)}`)[m
+[32m+[m[32m                    .then((res) => res.json())[m
+[32m+[m[32m                    .then((items) => renderSuggestions(items));[m
+[32m+[m[32m            }, 150);[m
+[32m+[m[32m        });[m
+[32m+[m[32m    }[m
+ }[m
+ [m
+ // Boutons appliquer / reset[m
+ if (applyFiltersBtn) {[m
+     applyFiltersBtn.addEventListener("click", () => {[m
+[31m-        fetchCatalogue(); // BaseUrl + filtres[m
+[32m+[m[32m        if (isCellier) {[m
+[32m+[m[32m            fetchCellier();[m
+[32m+[m[32m        } else {[m
+[32m+[m[32m            fetchCatalogue();[m
+[32m+[m[32m        }[m
+         toggleSortOptions(); // Ferme le panneau[m
+     });[m
+ }[m
+[36m@@ -222,8 +324,8 @@[m [mif (resetFiltersBtn) {[m
+     resetFiltersBtn.addEventListener("click", resetFilters);[m
+ }[m
+ [m
+[31m-// Cacher suggestions au clic[m
+[31m-if (searchInput && suggestionsBox) {[m
+[32m+[m[32m// Cacher suggestions au clic (uniquement catalogue/liste d'achat)[m
+[32m+[m[32mif (searchInput && suggestionsBox && !isCellier) {[m
+     document.addEventListener("click", (e) => {[m
+         if ([m
+             !searchInput.contains(e.target) &&[m
+[36m@@ -241,10 +343,16 @@[m [mfunction bindPaginationLinks() {[m
+     links.forEach((link) => {[m
+         link.addEventListener("click", (e) => {[m
+             e.preventDefault();[m
+[31m-            fetchCatalogue(link.href); // Ici on passe l’URL de la page[m
+[32m+[m[32m            if (isCellier) {[m
+[32m+[m[32m                fetchCellier(link.href);[m
+[32m+[m[32m            } else {[m
+[32m+[m[32m                fetchCatalogue(link.href);[m
+[32m+[m[32m            }[m
+         });[m
+     });[m
+ }[m
+[31m-document.addEventListener("DOMContentLoaded", () => {[m
+[31m-    if (container) bindPaginationLinks();[m
+[31m-});[m
+[32m+[m
+[32m+[m[32m// Initialisation[m
+[32m+[m[32mif (container) {[m
+[32m+[m[32m    bindPaginationLinks();[m
+[32m+[m[32m}[m

@@ -70,7 +70,11 @@
         <div class="flex gap-3 my-4 flex-wrap flex-col sm:flex-row">
             {{-- Select pour trier --}}
             <select id="sortFilter" class="border w-full px-5 py-2 rounded-lg flex-1" aria-label="Trier par">
-                <option value="date_import-desc" selected>Trier par...</option>
+                @if ($mode === "listeAchat")
+                    <option value="date_ajout-desc" selected>Trier par...</option>
+                @else
+                    <option value="date_import-desc" selected>Trier par...</option>
+                @endif
                 <option value="prix-asc">Prix (le moins cher)</option>
                 <option value="prix-desc">Prix (le plus cher)</option>
                 <option value="nom-asc">Nom (A - Z)</option>

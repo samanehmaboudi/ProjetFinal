@@ -32,9 +32,10 @@ const suggestionUrl =
 const suggestionsBox = document.getElementById("suggestionsBox");
 let suggestionTimeout = null;
 
-let isListeAchat = false;
+let sortFilterDefault = "date_import-desc";
 if (containerId === "listeAchatContainer") {
-    isListeAchat = true;
+    sortFilterDefault = "date_ajout-desc";
+    console.log(sortFilterDefault);
 }
 
 // Reset des filtres
@@ -46,10 +47,8 @@ function resetFilters() {
     if (millesimeFilter) millesimeFilter.value = "";
     if (priceMinFilter) priceMinFilter.value = "";
     if (priceMaxFilter) priceMaxFilter.value = "";
-    if (sortFilter)
-        sortFilter.value = isListeAchat
-            ? "date_ajout-desc"
-            : "date_import-desc";
+    if (sortFilter) sortFilter.value = sortFilterDefault;
+
     fetchCatalogue(); // Call sans arg → baseUrl utilisé
 }
 

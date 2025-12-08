@@ -17,6 +17,7 @@
             :millesimes="$millesimes" 
             url="/liste-achat/search" 
             suggestionUrl="/liste-achat/suggest"
+            mode="listeAchat"
             containerID="listeAchatContainer" 
         />
     {{-- État vide --}}

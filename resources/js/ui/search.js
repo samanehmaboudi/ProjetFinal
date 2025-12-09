@@ -43,11 +43,16 @@ if (cellierRoot) {
     container = document.getElementById(containerId);
     baseUrl = catalogueRoot.dataset.url || "/catalogue/search";
     suggestionUrl = catalogueRoot.dataset.suggestionUrl || "/catalogue/suggest";
-} else {
-    // Aucun contexte trouvé, on sort
-    console.warn("search.js : aucun contexte trouvé (cellier ou catalogue)");
 }
 
+// Si aucun contexte n'est trouvé, ne pas initialiser le script
+// (c'est normal sur certaines pages comme l'admin qui utilisent un autre système de recherche)
+if (!cellierRoot && !catalogueRoot) {
+    // Sortir silencieusement - pas besoin de warning
+    // Toutes les initialisations suivantes ne s'exécuteront pas
+} else {
+    // Initialiser uniquement si un contexte a été trouvé
+    
 // Suggestions (uniquement pour catalogue/liste d'achat)
 const suggestionsBox = document.getElementById("suggestionsBox");
 let suggestionTimeout = null;
@@ -355,3 +360,5 @@ function bindPaginationLinks() {
 if (container) {
     bindPaginationLinks();
 }
+
+} // Fin du bloc d'initialisation conditionnelle

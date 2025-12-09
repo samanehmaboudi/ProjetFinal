@@ -115,7 +115,8 @@
                         <x-delete-btn
                             :route="route('admin.users.destroy', $user->id)"
                             variant="menu"
-                            label="Supprimer l’usager"
+                            label="Supprimer l'usager"
+                            :ajax="true"
                         />
                     </div>
                 </div>

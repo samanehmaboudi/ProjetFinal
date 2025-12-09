@@ -107,6 +107,7 @@
                                         :route="route('admin.users.destroy', $user->id)"
                                         variant="icon"
                                         label="Supprimer"
+                                        :ajax="true"
                                         class="text-text-muted hover:text-red-600 transition-colors"
                                     />
                                 </div>
@@ -176,6 +177,7 @@
                                 <x-delete-btn
                                     :route="route('admin.users.destroy', $user->id)"
                                     variant="icon"
+                                    :ajax="true"
                                     class="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
                                 />
                             </div>

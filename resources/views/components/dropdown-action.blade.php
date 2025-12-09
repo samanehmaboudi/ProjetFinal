@@ -48,6 +48,7 @@
                 type="button" 
                 class="use-confirm block w-full text-left px-2 py-1 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
                 data-action="{{ $deleteUrl }}"
+                data-ajax="true"
                 role="menuitem"
             >
                 Supprimer

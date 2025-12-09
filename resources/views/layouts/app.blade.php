@@ -92,17 +92,14 @@
 
     @if(session('success') || session('error'))
     <script>
+        // Affiche les messages flash sous forme de toast dès que showToast est chargé
         function afficherToastFlash() {
             if (window.showToast) {
                 @if(session('success'))
-                window.showToast({
-                    !!json_encode(session('success')) !!
-                }, "success");
+                window.showToast({!! json_encode(session('success')) !!}, "success");
                 @endif
                 @if(session('error'))
-                window.showToast({
-                    !!json_encode(session('error')) !!
-                }, "error");
+                window.showToast({!! json_encode(session('error')) !!}, "error");
                 @endif
             } else {
                 setTimeout(afficherToastFlash, 50);

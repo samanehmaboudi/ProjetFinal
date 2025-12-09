@@ -57,40 +57,75 @@ class AdminController extends Controller
 
         // Empêcher de se désactiver soi-même
         if (Auth::id() === $user->id) {
-            return
-                back()
-                ->with('error', 'Vous ne pouvez pas désactiver votre propre compte.');
+            $message = 'Vous ne pouvez pas désactiver votre propre compte.';
+            
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 403);
+            }
+            
+            return back()->with('error', $message);
         }
 
         $user->is_active = ! $user->is_active;
         $user->save();
 
-        return
-            back()
-            ->with('success', 'Statut de l’usager mis à jour.');
+        $message = $user->is_active 
+            ? 'Le compte a été activé avec succès.' 
+            : 'Le compte a été désactivé avec succès.';
+
+        // Si la requête est AJAX, retourner une réponse JSON
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'is_active' => $user->is_active
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 
     /**
      * Supprimer un usager.
      */
-
     public function destroy($id)
     {
         $user = User::findOrFail($id);
 
         // Empêcher de se supprimer soi-même
         if (Auth::id() === $user->id) {
+            $message = 'Vous ne pouvez pas supprimer votre propre compte.';
+            
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 403);
+            }
+            
             return redirect()
                 ->route('admin.users.index')
-                ->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
+                ->with('error', $message);
         }
 
-        // On considère la "suppression" comme une désactivation
-        $user->is_active = false;
-        $user->save();
+        // Supprimer l'utilisateur (les celliers et listes d'achat seront supprimés en cascade)
+        $user->delete();
+
+        $message = 'Compte utilisateur supprimé avec succès.';
+
+        // Si la requête est AJAX, retourner une réponse JSON
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        }
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'Compte utilisateur désactivé.');
+            ->with('success', $message);
     }
 }

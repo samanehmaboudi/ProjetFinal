@@ -18,6 +18,7 @@ import "./ui/addToWishlistFromCellar";
 import "./ui/wishlistManage";
 import "./ui/wishlistTransfer";
 import "./ui/pageNavigation";
+import "./ui/adminToggleActive";
 
 /* ============================================================
    MODULE : Toasts – Petites notifications

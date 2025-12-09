@@ -2,6 +2,7 @@
     'route'   => null,
     'label'   => null,
     'variant' => 'icon', // "icon" ou "menu"
+    'ajax'    => false, // Activer AJAX pour la suppression
 ])
 
 @php
@@ -36,6 +37,7 @@
     type="button"
     class="{{ $classes }}"
     data-action="{{ $route }}"
+    @if($ajax) data-ajax="true" @endif
     aria-label="{{ $label ?? 'Supprimer' }}"
 >
     {{-- Icône --}}

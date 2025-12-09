@@ -293,7 +293,7 @@ class CellierController extends Controller
      * @param Cellier $cellier Le cellier contenant la bouteille
      * @param Bouteille $bouteille La bouteille à supprimer
      */
-    public function deleteBottle(Cellier $cellier, Bouteille $bouteille): RedirectResponse
+    public function deleteBottle(Cellier $cellier, Bouteille $bouteille)
     {
         // Vérifie que le cellier appartient au user
         $this->authorizeCellier($cellier);
@@ -305,6 +305,14 @@ class CellierController extends Controller
 
         // Supprimer la bouteille (dans le cellier seulement)
         $bouteille->delete();
+
+        // Si la requête est AJAX, retourner une réponse JSON
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'La bouteille a été supprimée du cellier.'
+            ]);
+        }
 
         return redirect()
             ->route('cellar.show', $cellier)

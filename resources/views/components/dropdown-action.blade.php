@@ -6,6 +6,7 @@
     {{-- AJOUT TRANSFERT --}}
     'transferUrl' => null,
     'item' => null,
+    'celliersCount' => 0,
     "absolute" => true,
 ])
 
@@ -37,7 +38,7 @@
                 data-url="{{ $transferUrl }}"
                 role="menuitem"
             >
-                Transférer au cellier
+                {{ $celliersCount === 1 ? 'transférer au cellier' : 'transférer à un cellier' }}
             </button>
         @endif
 

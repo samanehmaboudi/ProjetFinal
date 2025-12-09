@@ -50,6 +50,7 @@
                 <x-dropdown-action
                     :id="$item->id"
                     :item="$item"
+                    :celliersCount="$celliersCount ?? 0"
                     deleteUrl="{{ route('listeAchat.destroy', $item) }}"
                     transferUrl="{{ route('listeAchat.transfer', $item) }}" />
 

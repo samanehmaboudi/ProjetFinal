@@ -39,6 +39,7 @@
             'items' => $items,
             'count' => $items->total(),
             'isSearching' => false, // Pas de recherche active sur la page initiale
+            'celliersCount' => $celliersCount ?? 0, // Nombre de celliers pour le texte du bouton
         ])
     </section>
 

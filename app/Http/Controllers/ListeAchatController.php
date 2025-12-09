@@ -114,6 +114,9 @@ class ListeAchatController extends Controller
             }
         }
 
+        // Nombre de celliers de l'utilisateur
+        $celliersCount = $user->celliers()->count();
+
         return view('liste_achat.index', compact(
             'items',
             'totalPrice',
@@ -124,6 +127,7 @@ class ListeAchatController extends Controller
             'regions',
             'millesimes',
             'cellarMap',   // 🔸 on l'envoie à la vue
+            'celliersCount', // Nombre de celliers pour le texte du bouton
         ))->with('isSearching', false); // Pas de recherche active sur la page initiale
     }
 
@@ -544,12 +548,16 @@ class ListeAchatController extends Controller
                           $request->region || $request->millesime || 
                           $request->prix_min || $request->prix_max;
 
+        // Nombre de celliers de l'utilisateur
+        $celliersCount = $user->celliers()->count();
+
         return response()->json([
             'html' => view('liste_achat._liste_achat_list', [
                 'items'     => $items,
                 'count'     => $count,
                 'cellarMap' => $cellarMap,
                 'isSearching' => $hasActiveSearch, // Indique si une recherche/filtre est active
+                'celliersCount' => $celliersCount, // Nombre de celliers pour le texte du bouton
             ])->render()
         ]);
     }

@@ -39,14 +39,14 @@
         </div>
 
         {{-- Carte Principale --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-card rounded-2xl shadow-sm border border-border-base overflow-hidden">
             <div class="grid grid-cols-1 md:grid-cols-12">
 
                 {{-- Colonne image + type --}}
-                <div class="md:col-span-4 bg-gray-50 flex items-center justify-center p-8 md:p-10 border-b md:border-b-0 md:border-r border-gray-100 relative">
+                <div class="md:col-span-4 bg-neutral-200 flex items-center justify-center p-8 md:p-10 border-b md:border-b-0 md:border-r border-border-base relative">
                     {{-- Badge Type --}}
                     @if($donnees['type'])
-                    <span class="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-text-muted shadow-sm border border-gray-100">
+                    <span class="absolute top-4 left-4 bg-card px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-muted shadow-sm border border-border-base">
                         {{ $donnees['type'] }}
                     </span>
                     @endif
@@ -85,17 +85,17 @@
                 <div class="md:col-span-8 p-6 md:p-8 flex flex-col h-full">
 
                     {{-- 1. Header: Nom & Prix --}}
-                    <div class="flex flex-wrap justify-between items-start gap-4 mb-6 border-b border-gray-100 pb-6">
+                    <div class="flex flex-wrap justify-between items-start gap-4 mb-6 border-b border-border-base pb-6">
                         <div class="flex-1">
-                            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                            <h1 class="text-2xl md:text-3xl font-bold text-heading leading-tight">
                                 {{ $donnees['nom'] }}
                             </h1>
-                            <div class="flex items-center flex-wrap gap-2 mt-2 text-sm text-gray-700">
+                            <div class="flex items-center flex-wrap gap-2 mt-2 text-sm text-body">
                                 @if($donnees['pays'])
                                 <span>{{ $donnees['pays'] }}</span>
                                 @endif
                                 @if(isset($donnees['region']) && $donnees['region'])
-                                <span class="w-1 h-1 bg-gray-600 rounded-full"></span>
+                                <span class="w-1 h-1 bg-neutral-600 rounded-full"></span>
                                 <span>{{ $donnees['region'] }}</span>
                                 @endif
                             </div>
@@ -115,50 +115,50 @@
 
                         @if(isset($donnees['type']) && $donnees['type'])
                         <div>
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Type</span>
-                            <span class="text-gray-900 font-medium">{{ $donnees['type'] }}</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">Type</span>
+                            <span class="text-heading font-medium">{{ $donnees['type'] }}</span>
                         </div>
                         @endif
 
                         @if($donnees['pays'])
                         <div>
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Pays</span>
-                            <span class="text-gray-900 font-medium">{{ $donnees['pays'] }}</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">Pays</span>
+                            <span class="text-heading font-medium">{{ $donnees['pays'] }}</span>
                         </div>
                         @endif
 
                         @if(isset($donnees['region']) && $donnees['region'])
                         <div>
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Région</span>
-                            <span class="text-gray-900 font-medium">{{ $donnees['region'] }}</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">Région</span>
+                            <span class="text-heading font-medium">{{ $donnees['region'] }}</span>
                         </div>
                         @endif
 
                         @if($donnees['millesime'])
                         <div>
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Millésime</span>
-                            <span class="text-gray-900 font-medium">{{ $donnees['millesime'] }}</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">Millésime</span>
+                            <span class="text-heading font-medium">{{ $donnees['millesime'] }}</span>
                         </div>
                         @endif
 
                         @if(isset($donnees['format']) && $donnees['format'])
                         <div>
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">{{ $isCatalogue ? 'Volume' : 'Format' }}</span>
-                            <span class="text-gray-900 font-medium">{{ $donnees['format'] }}</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">{{ $isCatalogue ? 'Volume' : 'Format' }}</span>
+                            <span class="text-heading font-medium">{{ $donnees['format'] }}</span>
                         </div>
                         @endif
 
                         @if(isset($donnees['code_saq']) && $donnees['code_saq'])
                         <div>
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Code SAQ</span>
-                            <span class="font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded text-sm inline-block">{{ $donnees['code_saq'] }}</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">Code SAQ</span>
+                            <span class="font-mono text-heading font-medium">{{ $donnees['code_saq'] }}</span>
                         </div>
                         @endif
 
                         {{-- Lien SAQ.com (pour catalogue et bouteilles du cellier avec code_saq) --}}
                         @if(isset($donnees['url_saq']) && $donnees['url_saq'])
                         <div class="col-span-2">
-                            <span class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Voir sur SAQ.com</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-2">Voir sur SAQ.com</span>
                             <a
                                 href="{{ $donnees['url_saq'] }}"
                                 target="_blank"
@@ -175,7 +175,7 @@
 
                         @if(!$isCatalogue && isset($donnees['quantite']))
                         <div>
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">En stock</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">En stock</span>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium text-primary">
                                 {{ $donnees['quantite'] }} {{ $donnees['quantite'] > 1 ? 'bouteilles' : 'bouteille' }}
                             </span>
@@ -184,14 +184,14 @@
 
                         @if(!$isCatalogue && isset($donnees['date_ajout']) && $donnees['date_ajout'])
                         <div class="col-span-2">
-                            <span class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Ajouté le</span>
-                            <span class="text-gray-700">{{ $donnees['date_ajout']->format('d F Y') }}</span>
+                            <span class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1">Ajouté le</span>
+                            <span class="text-heading font-medium">{{ $donnees['date_ajout']->format('d F Y') }}</span>
                         </div>
                         @endif
                     </div>
 
                     {{-- 3. Zone d'Actions --}}
-                    <div class="mt-auto pt-6 border-t border-gray-100">
+                    <div class="mt-auto pt-6 border-t border-border-base">
 
                         {{-- Catalogue (Ajout) --}}
                         @if($isCatalogue)
@@ -199,7 +199,7 @@
                             <input type="hidden" name="bottle_id" value="{{ $bouteilleCatalogue->id }}">
 
                             <div class="w-full sm:w-32">
-                                <label class="block text-xs font-semibold text-gray-500 mb-1.5 ml-1" for="quantity">Quantité</label>
+                                <label class="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5 ml-1" for="quantity">Quantité</label>
                                 <div class="relative">
                                     <input
                                         type="number"
@@ -208,11 +208,11 @@
                                         id="quantity"
                                         aria-label="Quantité"
                                         min="1" max="10" value="1"
-                                        class="block w-full text-center rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5">
+                                        class="block w-full text-center rounded-lg border-border-base shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5">
                                 </div>
                             </div>
 
-                            <button type="submit" data-bottle-id="{{ $bouteilleCatalogue->id }}" class="add-to-cellar-btn w-full sm:flex-1 text-primary bg-button-default border-2 border-primary hover:bg-primary hover:text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2">
+                            <button type="submit" data-bottle-id="{{ $bouteilleCatalogue->id }}" class="add-to-cellar-btn w-full sm:flex-1 text-primary bg-button-default border-2 border-primary hover:bg-primary hover:text-card font-medium py-2.5 px-4 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center gap-2">
                                 <x-dynamic-component :component="'lucide-plus'" class="w-4 h-4" />
                                 Ajouter au cellier
                             </button>
@@ -222,16 +222,16 @@
                         @else
                         <div class="space-y-6">
                             {{-- Note et Avis --}}
-                            <div class="bg-gray-50 rounded-xl p-5 border border-gray-100 relative">
+                            <div class="bg-neutral-200 rounded-xl p-5 border border-border-base relative">
                                 <div class="flex justify-between items-center mb-3">
-                                    <h2 class="font-semibold text-gray-900">Notes de dégustation</h2>
+                                    <h2 class="font-semibold text-heading">Notes de dégustation</h2>
                                     @if(isset($donnees['note_degustation']) || isset($donnees['rating']))
                                     <x-dropdown-action
                                         :id="'note-' . $bouteille->id"
                                         :deleteUrl="route('bouteilles.note.delete', [$cellier, $bouteille])"
                                         :editUrl="route('bouteilles.note.edit', [$cellier, $bouteille])" />
                                     @else
-                                    <a href="{{ route('bouteilles.note.edit', [$cellier, $bouteille]) }}" class="text-base font-semibold text-primary hover:text-primary-dark hover:underline transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/10">
+                                    <a href="{{ route('bouteilles.note.edit', [$cellier, $bouteille]) }}" class="text-base font-semibold text-primary hover:text-primary-active hover:underline transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/10">
                                         Rédiger un avis
                                     </a>
                                     @endif
@@ -242,33 +242,30 @@
                                 </div>
 
                                 @if(isset($donnees['note_degustation']) && $donnees['note_degustation'])
-                                <p class="text-sm text-gray-600 italic leading-relaxed">"{{ $donnees['note_degustation'] }}"</p>
+                                <p class="text-sm text-muted italic leading-relaxed">"{{ $donnees['note_degustation'] }}"</p>
                                 @else
-                                <p class="text-sm text-gray-600 italic">Aucune note écrite pour le moment.</p>
+                                <p class="text-sm text-muted italic">Aucune note écrite pour le moment.</p>
                                 @endif
                             </div>
 
-                            {{-- Bouton Modifier Bouteille --}}
-                            @if(empty($bouteille->code_saq))
-                            <div class="flex justify-end">
-                                <x-edit-btn :route="route('bouteilles.edit', [$cellier, $bouteille])" label="Modifier la fiche" />
-                            </div>
-                            @endif
                         </div>
                         @endif
 
-                        {{-- Bouton Partager (seulement pour les bouteilles du cellier) --}}
+                        {{-- Bouton Partager et Modifier (seulement pour les bouteilles du cellier) --}}
                         @if(!$isCatalogue)
-                        <div class="flex justify-center mt-[25px]">
+                        <div class="flex justify-between items-center mt-[25px]">
                             <button
                                 type="button"
                                 id="shareBottleBtn"
-                                class="flex items-center gap-3 px-6 py-3 bg-button-default border-2 border-primary text-primary font-semibold rounded-lg hover:bg-button-hover hover:text-white active:bg-primary-active transition-colors duration-300 text-base cursor-pointer"
+                                class="flex items-center gap-3 px-6 py-3 bg-button-default border-2 border-primary text-primary font-semibold rounded-lg hover:bg-button-hover hover:text-card active:bg-primary-active transition-colors duration-300 text-base cursor-pointer"
                                 data-bouteille-id="{{ $bouteille->id }}"
                                 aria-label="Partager cette bouteille">
                                 <x-dynamic-component :component="'lucide-share-2'" class="w-6 h-6" />
                                 <span>Partager</span>
                             </button>
+                            @if(empty($bouteille->code_saq))
+                            <x-edit-btn :route="route('bouteilles.edit', [$cellier, $bouteille])" label="Modifier la fiche" />
+                            @endif
                         </div>
                         @endif
                     </div>

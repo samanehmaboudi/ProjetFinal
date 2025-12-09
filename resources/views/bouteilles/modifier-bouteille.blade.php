@@ -6,9 +6,17 @@
     <section class="p-4 sm:w-full max-w-4xl mx-auto">
         <div class="bg-card border border-border-base rounded-xl shadow-md p-6 space-y-6">
 
+            {{-- Lien retour --}}
+            <div class="mb-4">
+                <x-back-btn 
+                    :route="route('bouteilles.show', [$cellier, $bouteille])" 
+                    label="Retour aux détails" 
+                />
+            </div>
+
             {{-- En-tête --}}
             <x-page-header 
-                title="Modification manuelle d’une bouteille" 
+                title="Modification manuelle d'une bouteille" 
                 undertitle="Modifiez les informations de votre bouteille manuelle." 
             />
 

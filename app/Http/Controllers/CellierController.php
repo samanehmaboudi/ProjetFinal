@@ -14,6 +14,8 @@ use App\Models\Pays;
 use App\Models\TypeVin;
 use App\Models\Region;
 use App\Models\Bouteille;
+use Illuminate\Validation\Rule;
+
 
 /**
  * Contrôleur pour la gestion des celliers.
@@ -169,7 +171,7 @@ class CellierController extends Controller
         // Limite de 6 celliers par utilisateur
         if ($celliersCount >= 6) {
             $message = 'Vous avez atteint la limite maximale de 6 celliers. Veuillez supprimer un cellier existant avant d\'en créer un nouveau.';
-            
+
             return redirect()
                 ->route('cellar.index')
                 ->with('error', $message);
@@ -190,8 +192,19 @@ class CellierController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nom' => 'required|string|max:255',
+            'nom' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('celliers')->where(function ($query) use ($request) {
+                    return $query->where('user_id', $request->user()->id);
+                }),
+            ],
+        ], [
+            'nom.unique' => 'Vous avez déjà un cellier avec ce nom.',
+            'nom.max' => 'Le nom du cellier ne doit pas dépasser 20 caractères.',
         ]);
+
 
         $user = $request->user();
         $celliersCount = $user->celliers()->count();
@@ -199,7 +212,7 @@ class CellierController extends Controller
         // Limite de 6 celliers par utilisateur
         if ($celliersCount >= 6) {
             $message = 'Vous avez atteint la limite maximale de 6 celliers. Veuillez supprimer un cellier existant avant d\'en créer un nouveau.';
-            
+
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -310,7 +323,19 @@ class CellierController extends Controller
         $this->authorizeCellier($cellier);
 
         $validated = $request->validate([
-            'nom' => 'required|string|max:255',
+            'nom' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('celliers')
+                    ->ignore($cellier->id)
+                    ->where(function ($query) use ($request) {
+                        return $query->where('user_id', $request->user()->id);
+                    }),
+            ],
+        ], [
+            'nom.unique' => 'Vous avez déjà un cellier avec ce nom.',
+            'nom.max' => 'Le nom du cellier ne doit pas dépasser 20 caractères.',
         ]);
 
         $cellier->update([

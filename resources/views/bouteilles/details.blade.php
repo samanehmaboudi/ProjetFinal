@@ -3,24 +3,28 @@
 @section('title', 'Détails de la bouteille')
 
 @php
-    // Est-ce qu’on est sur une bouteille du catalogue ?
+    // Est-ce qu'on est sur une bouteille du catalogue ?
     $isCatalogue = isset($bouteilleCatalogue) && !isset($bouteille);
 
-    // URL d’où on vient
+    // URL d'où on vient
     $previousUrl  = url()->previous();
     // URL de la liste d'achat
     $wishlistUrl  = route('listeAchat.index');
-    // Est-ce qu’on vient de la liste d’achat ?
+    // Est-ce qu'on vient de la liste d'achat ?
     $fromWishlist = str_contains($previousUrl, $wishlistUrl);
 
     if ($fromWishlist) {
-        // Cas spécial : on vient de "Ma liste d’achat"
+        // Cas spécial : on vient de "Ma liste d'achat"
         $backRoute = $wishlistUrl;
-        $backLabel = 'Retour à ma liste d’achat';
-    } else {
-        // Cas normal : on revient simplement à la page précédente
+        $backLabel = "Retour à ma liste d'achat";
+    } elseif ($isCatalogue) {
+        // Cas catalogue : on revient au catalogue (page précédente)
         $backRoute = $previousUrl;
-        $backLabel = $isCatalogue ? 'Retour au catalogue' : 'Retour au cellier';
+        $backLabel = 'Retour au catalogue';
+    } else {
+        // Cas cellier : toujours retourner au cellier, pas à la page précédente
+        $backRoute = route('cellar.show', $cellier);
+        $backLabel = 'Retour au cellier';
     }
 @endphp
 

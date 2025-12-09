@@ -144,7 +144,16 @@ class CellierController extends Controller
             }
         }
 
-        return view('cellar.index', compact('celliers', 'showWelcomeTip', 'welcomeTipCellierId'));
+        $celliersCount = $celliers->count();
+        $canCreateMore = $celliersCount < 6;
+
+        return view('cellar.index', [
+            'celliers' => $celliers,
+            'showWelcomeTip' => $showWelcomeTip,
+            'welcomeTipCellierId' => $welcomeTipCellierId,
+            'celliersCount' => $celliersCount,
+            'canCreateMore' => $canCreateMore,
+        ]);
     }
 
     /**
@@ -166,19 +175,49 @@ class CellierController extends Controller
      * @param Request $request La requête HTTP contenant les données du formulaire
      * @return RedirectResponse Redirection vers la liste des celliers avec un message de succès
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
         ]);
 
-        $request->user()->celliers()->create([
+        $user = $request->user();
+        $celliersCount = $user->celliers()->count();
+
+        // Limite de 6 celliers par utilisateur
+        if ($celliersCount >= 6) {
+            $message = 'Vous avez atteint la limite maximale de 6 celliers. Veuillez supprimer un cellier existant avant d\'en créer un nouveau.';
+            
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message
+                ], 422);
+            }
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $message);
+        }
+
+        $user->celliers()->create([
             'nom' => $validated['nom'],
         ]);
 
+        $message = 'Le cellier a été créé avec succès.';
+
+        // Si la requête est AJAX, retourner une réponse JSON
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        }
+
         return redirect()
             ->route('cellar.index')
-            ->with('success', 'Le cellier a été créé avec succès.');
+            ->with('success', $message);
     }
 
     /**
@@ -490,7 +529,7 @@ class CellierController extends Controller
             ->with('success', 'Notes de dégustation mises à jour avec succès.');
     }
 
-    public function deleteNote(Cellier $cellier, Bouteille $bouteille): RedirectResponse
+    public function deleteNote(Cellier $cellier, Bouteille $bouteille)
     {
         $this->authorizeCellier($cellier);
 
@@ -503,9 +542,19 @@ class CellierController extends Controller
             'rating'           => null,
         ]);
 
+        $message = 'La note de dégustation a été supprimée avec succès.';
+
+        // Si la requête est AJAX, retourner une réponse JSON
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        }
+
         return redirect()
             ->route('bouteilles.show', [$cellier, $bouteille])
-            ->with('success', 'Notes de dégustation supprimées avec succès.');
+            ->with('success', $message);
     }
 
     // Ajout de bouteille du catalogue au cellier via API

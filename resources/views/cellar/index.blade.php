@@ -6,8 +6,15 @@
 
 @section('content')
     <section class="p-4 pt-2" aria-label="Gestion de mes celliers">
-        {{-- N'affiche pas le bouton modifier si aucun cellier --}}
-        <x-page-header title="Mes Celliers" />
+        {{-- En-tête avec compteur de celliers --}}
+        <header class="mt-header flex flex-wrap justify-between items-center" aria-label="En-tête de la page">
+            <h1 class="text-3xl font-bold font-heading text-heading">Mes Celliers</h1>
+            @if(isset($celliersCount))
+                <span class="text-sm font-medium text-text-muted">
+                    {{ $celliersCount }}/6
+                </span>
+            @endif
+        </header>
         
         
 

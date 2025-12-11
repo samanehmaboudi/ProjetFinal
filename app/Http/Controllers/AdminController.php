@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\StatisticsService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Signalement;
@@ -17,7 +19,7 @@ class AdminController extends Controller
         $search = $request->input('q');
 
         $query = User::query()
-            ->withCount('celliers')   // 👈 nombre de celliers par usager
+            ->withCount('celliers')   // nombre de celliers par usager
             ->orderBy('created_at', 'desc');
 
         if (!empty($search)) {
@@ -131,5 +133,77 @@ class AdminController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', $message);
+    }
+
+    /**
+     * Page du tableau de bord des statistiques.
+     * (La vue chargera les données via AJAX.)
+     */
+    public function statistics()
+    {
+        return view('admin.statistics.index');
+    }
+
+    /**
+     * Endpoint JSON pour les statistiques (filtrage par période).
+     */
+    public function statisticsData(
+        Request $request,
+        StatisticsService $statisticsService
+    ) {
+        [$start, $end] = $this->resolvePeriod($request);
+
+        $data = $statisticsService->getAllStatistics($start, $end);
+
+        return response()->json($data);
+    }
+
+    /**
+     * Interprète le filtre de période envoyé depuis le front :
+     * - day, week, month, year, custom
+     */
+    protected function resolvePeriod(Request $request): array
+    {
+        $period = $request->input('period', 'month');
+        $now    = Carbon::now();
+
+        switch ($period) {
+            case 'day':
+                $start = $now->copy()->startOfDay();
+                $end   = $now->copy()->endOfDay();
+                break;
+
+            case 'week':
+                $start = $now->copy()->startOfWeek();
+                $end   = $now->copy()->endOfWeek();
+                break;
+
+            case 'year':
+                $start = $now->copy()->startOfYear();
+                $end   = $now->copy()->endOfYear();
+                break;
+
+            case 'custom':
+                $startInput = $request->input('start_date');
+                $endInput   = $request->input('end_date');
+
+                if ($startInput && $endInput) {
+                    $start = Carbon::parse($startInput)->startOfDay();
+                    $end   = Carbon::parse($endInput)->endOfDay();
+                } else {
+                    // fallback : mois courant si mauvaise saisie
+                    $start = $now->copy()->startOfMonth();
+                    $end   = $now->copy()->endOfMonth();
+                }
+                break;
+
+            case 'month':
+            default:
+                $start = $now->copy()->startOfMonth();
+                $end   = $now->copy()->endOfMonth();
+                break;
+        }
+
+        return [$start, $end];
     }
 }

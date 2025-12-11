@@ -236,6 +236,13 @@ Route::middleware(['auth', 'active', 'is_admin'])
         Route::delete('/users/{id}', [AdminController::class, 'destroy'])
             ->name('users.destroy');
 
+        // ROUTES STATISTIQUES
+        Route::get('/statistics', [AdminController::class, 'statistics'])
+            ->name('statistics.index');
+
+        Route::get('/statistics/data', [AdminController::class, 'statisticsData'])
+            ->name('statistics.data');
+
         Route::get('/signalements/{signalement}', [SignalementController::class, 'show'])
             ->name('signalements.show');
 
@@ -250,4 +257,5 @@ Route::middleware(['auth', 'active', 'is_admin'])
         // Suppression d'un signalement
         Route::delete('/signalements/{signalement}', [SignalementController::class, 'destroy'])
             ->name('signalements.destroy');
+            
     });

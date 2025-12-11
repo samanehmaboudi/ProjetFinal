@@ -7,6 +7,7 @@ use App\Services\StatisticsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Signalement;
 
 class AdminController extends Controller
 {
@@ -30,9 +31,12 @@ class AdminController extends Controller
 
         $users = $query->paginate(10)->withQueryString();
 
+        $nonLus = Signalement::where('is_read', false)->count();
+
         return view('admin.users.index', [
             'users'  => $users,
             'search' => $search,
+            'nonLus' => $nonLus,
         ]);
     }
 

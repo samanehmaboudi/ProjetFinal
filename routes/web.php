@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ListeAchatController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PartageController;
+use App\Http\Controllers\SignalementController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
@@ -30,6 +31,14 @@ Route::post('/logout', [AuthController::class, 'logout'])
 // Routes protégées : seulement accessibles si la session est ouverte
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/', [CatalogueController::class, 'index'])->name('bouteille.catalogue');
+
+    // Signalement de problème sur une bouteille du catalogue
+    Route::get('/catalogue/{bouteille}/signaler', [SignalementController::class, 'create'])
+        ->name('signalement.create');
+
+    // Enregistrement d'un signalement
+    Route::post('/catalogue/{bouteille}/signaler', [SignalementController::class, 'store'])
+        ->name('signalement.store');
 
     // Catalogue de bouteilles
     Route::get('/catalogue/search', [CatalogueController::class, 'search'])
@@ -233,4 +242,20 @@ Route::middleware(['auth', 'active', 'is_admin'])
 
         Route::get('/statistics/data', [AdminController::class, 'statisticsData'])
             ->name('statistics.data');
+
+        Route::get('/signalements/{signalement}', [SignalementController::class, 'show'])
+            ->name('signalements.show');
+
+        // Liste des signalements
+        Route::get('/signalements', [SignalementController::class, 'index'])
+            ->name('signalements.index');
+
+        // Marquer un signalement comme lu
+        Route::patch('/signalements/{signalement}/read', [SignalementController::class, 'markAsRead'])
+            ->name('signalements.read');
+
+        // Suppression d'un signalement
+        Route::delete('/signalements/{signalement}', [SignalementController::class, 'destroy'])
+            ->name('signalements.destroy');
+            
     });

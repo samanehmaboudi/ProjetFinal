@@ -12,11 +12,18 @@
     $wishlistUrl  = route('listeAchat.index');
     // Est-ce qu'on vient de la liste d'achat ?
     $fromWishlist = str_contains($previousUrl, $wishlistUrl);
+    // Est-ce qu'on vient d'un signalement admin ?
+    $isSignalementShow = preg_match('#/admin/signalements/(\d+)$#', $previousUrl, $matches);
+
 
     if ($fromWishlist) {
         // Cas spécial : on vient de "Ma liste d'achat"
         $backRoute = $wishlistUrl;
         $backLabel = "Retour à ma liste d'achat";
+    } elseif ($isSignalementShow) {
+        // Cas spécial : on vient d'un signalement admin
+        $backRoute = $previousUrl;
+        $backLabel = 'Retour aux signalements';
     } elseif ($isCatalogue) {
         // Cas catalogue : on revient au catalogue (page précédente)
         $backRoute = $previousUrl;
@@ -90,7 +97,7 @@
                             <h1 class="text-2xl md:text-3xl font-bold text-heading leading-tight">
                                 {{ $donnees['nom'] }}
                             </h1>
-                            <div class="flex items-center flex-wrap gap-2 mt-2 text-sm text-body">
+                            <div class="flex items-center flex-wrap gap-2 mt-2 text-sm text-neutral-700">
                                 @if($donnees['pays'])
                                 <span>{{ $donnees['pays'] }}</span>
                                 @endif
@@ -195,7 +202,7 @@
 
                         {{-- Catalogue (Ajout) --}}
                         @if($isCatalogue)
-                        <form class="flex flex-col sm:flex-row gap-4 items-end sm:items-stretch" aria-label="Ajouter au cellier">
+                        <form class="flex flex-col sm:flex-row gap-4 items-end sm:items-stretch md-5" aria-label="Ajouter au cellier">
                             <input type="hidden" name="bottle_id" value="{{ $bouteilleCatalogue->id }}">
 
                             <div class="w-full sm:w-32">
@@ -217,6 +224,7 @@
                                 Ajouter au cellier
                             </button>
                         </form>
+                        <a href="{{ route('signalement.create', $bouteilleCatalogue->id) }}" class="inline-block mt-4 text-base font-semibold text-primary hover:text-primary-active hover:underline transition-colors px-3 py-2 rounded-lg hover:bg-primary/10">Signaler un problème</a>
 
                         {{-- Cellier (Notes & Modif) --}}
                         @else

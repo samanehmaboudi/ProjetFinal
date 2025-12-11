@@ -89,11 +89,11 @@
 
                 <div id="stats-custom-range" class="hidden md:flex md:items-center md:gap-2">
                     <input type="date" id="stats-start"
-                        class="border border-border-base bg-card text-xs rounded-md px-2 py-1 text-text-main" />
+                        class="border border-border-base bg-card text-xs rounded-md px-2 py-1 text-text-main" disabled />
                     <input type="date" id="stats-end"
-                        class="border border-border-base bg-card text-xs rounded-md px-2 py-1 text-text-main" />
+                        class="border border-border-base bg-card text-xs rounded-md px-2 py-1 text-text-main" disabled />
                     <button id="stats-apply"
-                        class="inline-flex items-center justify-center rounded-md px-3 py-1 text-xs font-medium text-white bg-primary hover:bg-primary-hover transition-colors">
+                        class="inline-flex items-center justify-center rounded-md px-3 py-1 text-xs font-medium text-white bg-primary hover:bg-primary-hover transition-colors" disabled>
                         Appliquer
                     </button>
                 </div>
@@ -156,5 +156,4 @@
     window.ADMIN_STATS_DATA_URL = "{{ route('admin.statistics.data') }}";
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-@vite('resources/js/ui/admin-statistics.js')
 @endsection

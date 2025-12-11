@@ -19,7 +19,7 @@ import "./ui/wishlistManage";
 import "./ui/wishlistTransfer";
 import "./ui/pageNavigation";
 import "./ui/adminToggleActive";
-import './ui/admin-statistics';
+import './ui/adminStatistics';
 
 /* ============================================================
    MODULE : Toasts – Petites notifications

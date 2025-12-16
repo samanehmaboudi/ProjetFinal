@@ -36,6 +36,16 @@ Permettre à un utilisateur de :
 - ✅ **Partage social**
 
 ---
+## 🎥 Démo vidéo
+
+<video src="docs/demo.mp4" controls width="640">
+  Votre navigateur ne supporte pas la lecture vidéo.
+</video>
+
+[➡️ Télécharger la vidéo](docs/demo.mp4)
+
+---
+
 
 ## ⚙️ Stack technique
 
